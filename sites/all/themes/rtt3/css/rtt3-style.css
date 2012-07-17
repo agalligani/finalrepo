@@ -1154,7 +1154,13 @@ div#discussion-legend {
 	float: left;
 	clear: left;
 	display: block;
+	border-bottom: solid 2px #bb7777;
+	padding-bottom: 10px;
+	margin-top: 15px;
+	margin-bottom: 27px;
+	width: 100%;
 }
+
 
 div#key1, div#key2, div#key3   {
 	float: left;
@@ -4395,8 +4401,73 @@ div.vertical-tabs ul.vertical-tabs-list li {
 		width: 65px;
 		margin-top: -3px;
 	}
-
 	
+	div.view-content-global-discussions-3 div.view-content  li.views-row  {
+		border: none;
+		margin-top: 20px;
+	}
+	
+	div.view-content-global-discussions-3 div.view-content  div.views-field-title  {
+	margin-top: -2px;
+	}
+	
+	div.view-content-global-discussions-3 div.view-content  div.views-field-title  span {
+		font-size: 13px;
+	}
+
+	div#discussion-links-wrapper {
+		width: 100%;
+		margin-top: -28px;
+		margin-bottom: 17px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		background-color: #fffff1;
+		border: solid 1px #fffaa3;
+		border-radius: 10px;
+	}
+
+	ul#discussion-links {
+		margin: auto;
+		list-style: none;
+	}
+	
+		ul#discussion-links  li {
+		background-image: none;
+		font-size: 14px;
+	}
+	
+		ul#discussion-links  li.active {
+		background-image: none;
+		margin-left: -8px;
+/*		background-color: #efefef; */
+	}
+	
+	ul#discussion-links  li a {
+		color: #888888;
+		text-decoration: none;
+	}
+	
+	ul#discussion-links  li a:hover {
+			text-decoration: none;
+		color: #333333;
+	}
+	
+	ul#discussion-links  li.active a {
+		color: #993333;
+	}
+			
+	div#discussion-select-prompt {
+		font-size: 12px;
+		font-weight: bold;
+		color: #2255ff;
+		text-align: center;
+		width: 100%;
+		margin-top: 20px;
+		margin-bottom: 17px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+	}
+
 	/**************** Fix the Theme Developer problem ***********************/
 	
 	
