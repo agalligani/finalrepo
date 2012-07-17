@@ -1,0 +1,176 @@
+	
+		panel-col-first	h2.pane-title {
+			display: none;
+		}
+		
+		.pane-content {
+		}
+		
+		#content-rotator-wrapper {
+			height: 235px;
+			display: block;
+			overflow: hidden;
+			width: 100%;
+			overflow: hidden;
+		}
+		
+		#content-rotator-wrapper-group {
+			height: 250px;
+			display: block;
+			overflow: hidden;
+			width: 100%;
+		}
+		
+		#main-box {
+			width: 100%;
+			height: 250px;
+			background: #121245 url(../content_rotator/images/movie-gradient.png) repeat-y 0 0;
+			border: solid 1px #ccddee;
+			position: absolute;
+			left: 0;
+			top: 0;
+			overflow: hidden;
+		}
+		
+		#content-rotator-wrapper-group #main-box {
+			width: 685px;
+			height: 250px;
+			background: #121245 url(../content_rotator/images/movie-gradient.png) repeat-y 0 0;
+			border: solid 1px #ccddee;
+			position: absolute;
+			left: 20px;
+			top: 0;
+			overflow: hidden;
+		}
+		.vid-box {
+			width: 100%;
+			height: 250px;
+			position: absolute;
+			left: 500px;
+			top: 0px;
+		}
+		
+		.vid-text {
+			width: 280px;
+			margin: 0 0 0 18px;
+			color: #ffffff;
+		}
+		
+		.vid-text h2 {
+			font-family: Arial, Helvetica, sans-serif;
+			font-weight: normal;
+			font-size: 24px;
+			color: #ffffff;
+			line-height: 26px;
+			}
+
+/* .vid-text p is overridden in the rtt3-style.css file, line 2115 approx. */		
+	
+		.vid-text p {
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 18px;
+			color: #ffffff;
+			}
+			
+			
+		#vid-buttons {
+			width: 165px;
+			height: 42px;
+			background-color: transparent;
+			position: absolute;
+			left: 65px;
+			top: 185px;
+			display: block;
+			z-index: 5000;
+		}
+		
+		.vid-button {
+			width: 40px;
+			height: 40px;
+			text-align: center;
+			font-family: Arial, Helvetica, sans-serif;			
+			font-size: 24px;
+			color: #ffffff;
+			float: left;
+			margin: 0 0 0 14px;			
+			background-color: #336699;
+			line-height: 40px;
+			border-radius: 10px;
+		}
+		
+ 		#vid-buttons .active {
+		    background-color: #ffffff;
+			color: #333333;
+		}
+
+		
+		.vid-wrapper {
+			position: absolute; 
+			right: 15px; 
+			top: 14px;
+			-moz-box-shadow: 0px 2px 10px rgba(0, 0, 0, .3);
+			box-shadow: 0px 2px 10px rgba(0, 0, 0, .3);
+			-webkit-box-shadow: 0px 2px 10px rgba(0, 0, 0, .3);
+			line-height: 0;
+		}
+		
+		
+		div#overlay_wrapper { 
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			z-index: 2000;
+		}
+		
+		div#overlay_tint {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #112244;
+			text-align: center;
+			z-index: 1999;
+		}
+		
+		div#action_box {
+			margin: 120px auto;
+			width: 360px;
+			height: 285px;
+			background-color: #222222;
+			position: relative;
+		}
+		
+		div#action_box p {
+			display: block;
+			margin-top: 14px;
+			border-top: solid 14px #222222;
+		}
+	
+		a#close_button {
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			width: 18px;
+			height: 16px;
+			font-weight: bold;
+			font-size: 18px;
+			line-height: 14px;
+			color: #ffdede;
+			background-color: #222222;
+		}
+		
+		a#close_button:link,
+		a#close_button:visited,
+		a#close_button:active {
+			text-decoration: none;
+		}
+		
+		a#close_button:hover {
+			text-decoration: none;
+			font-weight: bold;
+			color: #6666ff;
+		}

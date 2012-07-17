@@ -1,0 +1,35 @@
+diff --git a/modules/features.features_override.inc b/modules/features.features_override.inc
+--- a/modules/features.features_override.inc
++++ b/modules/features.features_override.inc
+@@ -69,3 +69,31 @@
+ function features_override_imagecache_default_presets_alter(&$items) {
+   features_override_features_default_alter($items, "imagecache");
+ }
++
++/**
++ * Implementation of hook_fieldgroup_default_groups_alter().
++ */
++function features_override_fieldgroup_default_groups_alter(&$items) {
++  features_override_features_default_alter($items, "fieldgroup");
++}
++
++/**
++ * Implementation of hook_conditional_fields_default_fields_alter().
++ */
++function features_override_conditional_fields_default_fields_alter(&$items) {
++  features_override_features_default_alter($items, "conditional_fields");
++}
++
++/**
++ * Implementation of hook_rules_defaults_alter().
++ */
++function features_override_rules_defaults_alter(&$items) {
++  features_override_features_default_alter($items, "rules_categories");
++}
++
++/**
++ * Implementation of hook_heartbeat_message_info_alter().
++ */
++function features_override_heartbeat_message_info_alter(&$items) {
++  features_override_features_default_alter($items, "heartbeat");
++}

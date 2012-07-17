@@ -1,0 +1,82 @@
+<?php
+
+include_once('reformsupportnetwork_core.features.inc');
+
+define('CTRL', 1000);
+define('SHIFT', 2000);
+define('ALT', 4000);
+
+/**
+ * Add keyboard shortcuts for numbered and bulleted lists in CKEditor.
+ * Implements wysiwyg_editor_settings_alter()
+ */
+function reformsupportnetwork_core_wysiwyg_editor_settings_alter(&$settings, $context) {
+  if ($context['profile']->editor == 'ckeditor') {
+    $settings['keystrokes'] = array(
+      array(CTRL + SHIFT + 55 /*7*/, 'numberedlist'),
+      array(CTRL + SHIFT + 56 /*8*/, 'bulletedlist'));
+  }
+}
+
+/**
+ * Set defaults for profile items. Profile module does not support defaults.
+ * Implements hook_user()
+ */
+function reformsupportnetwork_core_user($op, &$edit, &$account, $category=NULL) {
+  if ($op == 'insert') {
+    // Check custom field "public listing" by default.
+    $result = db_query("SELECT fid FROM {profile_fields} WHERE name = 'profile_public_listing'");
+    if (!$result) {
+      return;
+    }
+    $public_listing = db_fetch_object($result);  // Will be only one result.
+    $data = array(
+      'fid' => $public_listing->fid,
+      'uid' => $account->uid,
+      'value' => 1
+    );
+    drupal_write_record('profile_values', $data);
+  }
+}
+
+/**
+ * Dynamically set the breadcrumbs.
+ *
+ * Implements hook_init()
+ */
+function reformsupportnetwork_core_init() {
+  $path = $_GET['q'];  // The requested path (Eg, node/2)
+
+  $breadcrumb = drupal_get_breadcrumb();
+  $breadcrumb_changed = False;
+
+  // Break the path into pieces
+  $path = explode('/', $path);
+
+  switch ($path[0]) {
+    case 'content':
+      if ($path[1]) {
+        // Remove Community added by Commons Core
+        array_pop($breadcrumb);
+        $breadcrumb_changed = True;
+      }
+      break;
+
+    case 'notices':
+    case 'featured':
+    case 'userpoints':
+    case 'users':
+    case 'analytics':
+    case 'tagadelic':
+      // Remove Community added by Commons Core
+      array_pop($breadcrumb);
+      $breadcrumb_changed = True;
+      break;
+  }
+
+  // Check if we've changed any breadcrumbs
+  if ($breadcrumb_changed) {
+    // If so, set them
+    drupal_set_breadcrumb($breadcrumb);
+  }
+}

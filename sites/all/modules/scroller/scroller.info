@@ -1,0 +1,5 @@
+; $Id: 
+name = "Scroller"
+description = "Custom module to scroll thru content."
+package = "Maher & Maher"
+core = "6.x"

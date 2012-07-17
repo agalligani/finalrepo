@@ -1,0 +1,13 @@
+diff --git a/date_popup/date_popup.module b/date_popup/date_popup.module
+--- a/date_popup/date_popup.module
++++ b/date_popup/date_popup.module
+@@ -674,6 +674,9 @@
+   if (isset($element['#children'])) {
+     $output = $element['#children'];
+   }
++  if (isset($element['date']['#id'])) {
++    $element['#id'] = $element['date']['#id'];
++  }
+   return '<div class="'. $class .'">'. theme('form_element', $element, $output) .'</div>';
+ }
+ 

@@ -1,0 +1,40 @@
+diff --git a/features_override.module b/features_override.module
+--- a/features_override.module
++++ b/features_override.module
+@@ -323,7 +323,7 @@
+ 
+ 
+ /**
+- * Add a variable to the hive of arrays and objects which 
++ * Add a variable to the hive of arrays and objects which
+  * are tracked for whether they have recursive entries
+  *
+  * @param &$bee
+@@ -338,9 +338,9 @@
+   if (!is_null($bee)) {
+     // Stain it.
+     $recursion_marker = FEATURES_OVERRIDE_RECURSION_MARKER;
+-    (is_object($bee))
+-      ? @($bee->$recursion_marker++)
+-      : @($bee[$recursion_marker]++);
++    (is_array($bee))
++      ? @($bee[$recursion_marker]++)
++      : @($bee->$recursion_marker++);
+ 
+     $bees[0][] =& $bee;
+   }
+@@ -356,11 +356,11 @@
+   $hive = _features_override_hive();
+   foreach($hive as $i => $bee){
+     $recursion_marker = FEATURES_OVERRIDE_RECURSION_MARKER;
+-    if (is_object($bee)) {
+-      unset($hive[$i]->$recursion_marker);
++    if (is_array($bee)) {
++      unset($hive[$i][$recursion_marker]);
+     }
+     else {
+-      unset($hive[$i][$recursion_marker]);
++      unset($hive[$i]->$recursion_marker);
+     }
+   }
+ }

@@ -1,0 +1,94 @@
+<?php
+// $Id: advanced_mail_reroute.install,v 1.1.2.1 2009/04/30 05:23:51 rohinknight Exp $
+
+/**
+ * @file
+ * Install file for Mail reroute module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function advanced_mail_reroute_install() {
+  drupal_install_schema('advanced_mail_reroute');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function advanced_mail_reroute_uninstall() {
+  drupal_uninstall_schema('advanced_mail_reroute');
+  
+  variable_del('advanced_mail_reroute_default_rule');
+  variable_del('advanced_mail_reroute_primary_email');
+  variable_del('advanced_mail_reroute_override');
+  variable_del('advanced_mail_reroute_enable_logging');
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function advanced_mail_reroute_schema() {
+  $schema['advanced_mail_reroute_rules'] = array(
+    'description' => 'Stores reroute rules for advanced_mail_reroute module.',
+    'fields' => array(
+      'mailkey' => array(
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE
+      ),
+      'reroute_rule' => array(
+        'type' =>  'int',
+        'size' => 'tiny',
+        'not null' => TRUE
+      ),
+      'email' => array(
+        'type' => 'text',
+        'not null' => TRUE
+      )
+    ),
+    'primary key' => array('mailkey'),
+    'indexes' => array(
+      'mailkey' => array('mailkey')
+    )
+  );
+  $schema['advanced_mail_reroute_log'] = array(
+    'description' => 'Stores logs of activity recorded by advanced_mail_reroute module.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'mailkey' => array(
+        'type' => 'text',
+        'not null' => TRUE
+      ),
+      'from_email' => array(
+        'type' => 'text',
+        'not null' => TRUE
+      ),
+      'to_email' => array(
+        'type' => 'text',
+        'not null' => TRUE
+      ),
+      'reroute_rule' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE
+      ),
+      'reroute_email' => array(
+        'type' => 'text',
+        'not null' => TRUE
+      )
+    ),
+    'primary key' => array('id')
+  );
+  
+  return $schema;
+}

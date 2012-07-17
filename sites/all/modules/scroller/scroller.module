@@ -1,0 +1,54 @@
+<?php
+/**
+* Implementation of hook_block().
+* @param string $op one of "list", "view", "save" and "configure"
+* @param integer $delta code to identify the block
+* @param array $edit only for "save" operation
+*/
+function scroller_block($op = 'list', $delta = 0, $edit = array()) { 
+  if ($op == "list") {
+    // Generate listing of blocks from this module, for the admin/block page
+    $block = array();
+    $block[0]["info"] = t('Scroller');
+  } 
+  
+  else if ($op == 'view') {
+    // Generate our block content
+	
+	
+    // content variable that will be returned for display
+    $block['subject']='Scroller Content';
+	
+	$block['content'] = "
+		<div id='vid-box'>
+		<div id='vid-text'>
+		<h2>Welcome From Secretary Duncan</h2>	
+			<p>Welcome to the School Turnaround Learning Community.</p>
+		</div>
+		<div id='vid-buttons'>
+			<div class='vid-button active'>1</div>
+			<div class='vid-button'>2</div>
+			<div class='vid-button'>3</div>
+		</div>
+		<div id='vid-wrapper'>
+			<iframe allowfullscreen=\"\" frameborder=\"0\" height=\"193\" longdesc=\"https://www.youtube.com/ixC4aj5Me0c\" scrolling=\"no\" src=\"https://www.youtube.com/embed/ixC4aj5Me0c?rel=0&amp;wmode=transparent\" title=\"YouTube video player\" width=\"317\">
+			</iframe>
+		</div>
+	</div>";
+  }
+
+  
+      return $block;
+
+} // function scroller_block
+
+
+
+//db_query("DELETE FROM {cache};");
+
+//$lf_vid_module_path=drupal_get_path('module','lf_vid');
+//$path= getcwd().'/'.$lf_vid_module_path.'/includes/';
+//$files = file_scan_directory($path, '^lf_vid\..*\.inc$');
+//foreach ($files as $filename => $file) {
+//  include_once($filename);
+//}

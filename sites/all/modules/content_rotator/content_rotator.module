@@ -1,0 +1,46 @@
+<?php
+
+/*
+ * Implements hook_init
+ */
+
+function content_rotator_init(){
+  drupal_add_css(drupal_get_path('module', 'content_rotator') .'/content_rotator.css');
+  drupal_add_css(drupal_get_path('module', 'content_rotator') .'/group_videos.css');
+  drupal_add_js(drupal_get_path('module', 'content_rotator') .'/content_rotator.js');
+  drupal_add_js(drupal_get_path('module', 'content_rotator') .'/group_videos.js');
+}
+
+/* 
+ * Implements hook_menu
+ */
+
+function content_rotator_menu() {
+	$items = array();
+	$items['scroller'] = array(
+    'title' => t('Set rotator values'),
+    'description' => t('Use this form to change settings for the front page'),
+    'page callback' => 'content_rotator_list',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );	
+   return $items;
+ }
+
+function content_rotator_list() {
+	$page = '<b>Select the scroller link which you intend to update.</b><br/>';
+	$result = db_query('SELECT n.nid, n.title, n.created 
+	FROM {node} n WHERE n.type = "scroller"');
+	
+	 while ($node = db_fetch_object($result)) {
+    // Perform operations on $node->body, etc. here.
+
+	
+	$page .= sprintf('<a href=\'/docroot/node/%s/edit\' >%s</a><br/>',''+$node->nid+'',$node->title);
+	$page .= sprintf('<a href=\'/docroot/%s\' >%s</a><br/>',$node->path,'-> Preview');
+	
+  }
+	return $page;
+}
+ 
+ 

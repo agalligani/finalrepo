@@ -1,0 +1,21 @@
+diff --git a/taxonomy.module b/taxonomy.module
+--- a/taxonomy.module
++++ b/taxonomy.module
+@@ -454,7 +454,7 @@
+     if ($tree && (count($tree) > 0)) {
+       $options[$vocabulary->name] = array();
+       foreach ($tree as $term) {
+-        $options[$vocabulary->name][$term->tid] = str_repeat('-', $term->depth) . $term->name;
++        $options[$vocabulary->name][$term->tid] = str_repeat('» ', $term->depth) . $term->name;
+       }
+     }
+   }
+@@ -1083,7 +1083,7 @@
+     foreach ($tree as $term) {
+       if (!in_array($term->tid, $exclude)) {
+         $choice = new stdClass();
+-        $choice->option = array($term->tid => str_repeat('-', $term->depth) . $term->name);
++        $choice->option = array($term->tid => str_repeat('» ', $term->depth) . $term->name);
+         $options[] = $choice;
+       }
+     }

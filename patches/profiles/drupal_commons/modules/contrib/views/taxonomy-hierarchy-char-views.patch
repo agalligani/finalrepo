@@ -1,0 +1,12 @@
+diff --git a/modules/taxonomy/views_handler_filter_term_node_tid.inc b/modules/taxonomy/views_handler_filter_term_node_tid.inc
+--- a/modules/taxonomy/views_handler_filter_term_node_tid.inc
++++ b/modules/taxonomy/views_handler_filter_term_node_tid.inc
+@@ -108,7 +108,7 @@
+         if ($tree) {
+           foreach ($tree as $term) {
+             $choice = new stdClass();
+-            $choice->option = array($term->tid => str_repeat('-', $term->depth) . $term->name);
++            $choice->option = array($term->tid => str_repeat('» ', $term->depth) . $term->name);
+             $options[] = $choice;
+           }
+         }

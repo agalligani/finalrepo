@@ -1,0 +1,545 @@
+diff --git a/date.css b/date.css
+--- a/date.css
++++ b/date.css
+@@ -24,7 +24,8 @@
+ 
+ .container-inline-date .form-item input,
+ .container-inline-date .form-item select,
+-.container-inline-date .form-item option {
++.container-inline-date .form-item option,
++.container-inline-date .ui-datepicker-trigger {
+   margin-right: 5px; /* LTR */
+ }
+ 
+diff --git a/date_popup/date_popup.js b/date_popup/date_popup.js
+--- a/date_popup/date_popup.js
++++ b/date_popup/date_popup.js
+@@ -4,31 +4,48 @@
+  * Attaches the calendar behavior to all required fields
+  */
+ Drupal.behaviors.date_popup = function (context) {
+-  for (var id in Drupal.settings.datePopup) {
+-    $('#'+ id).bind('focus', Drupal.settings.datePopup[id], function(e) {
+-      if (!$(this).hasClass('date-popup-init')) {
+-        var datePopup = e.data;
+-        // Explicitely filter the methods we accept.
+-        switch (datePopup.func) {
+-          case 'datepicker':
+-            $(this)
+-              .datepicker(datePopup.settings)
+-              .addClass('date-popup-init')
+-            $(this).click(function(){
+-              $(this).focus();
+-            });
+-            break;
++  var datePopup = Drupal.settings.datePopup;
+ 
+-          case 'timeEntry':
+-            $(this)
+-              .timeEntry(datePopup.settings)
+-              .addClass('date-popup-init')
+-            $(this).click(function(){
+-              $(this).focus();
+-            });
+-            break;
++  $('input.date-popup-date:not(.date-popup-processed)', context).each(function() {
++    var inputid = $(this).addClass('date-popup-processed')[0].id;
++    if (datePopup[inputid]) {
++      var settings = datePopup[inputid].settings;
++      var func = datePopup[inputid].func;
++
++      // Explicitely filter the methods we accept.
++      if (func == 'datepicker') {
++        // make minDate and maxDate JS Date objects when they are integers
++        if (typeof settings.minDate == 'number') {
++          settings.minDate = new Date(settings.minDate * 1000);
+         }
++        if (typeof settings.maxDate == 'number') {
++          settings.maxDate = new Date(settings.maxDate * 1000);
++        }
++
++        if (settings.weekdayDisable.length > 0 || settings.dayDisable.length > 0) {
++          settings.beforeShowDay = function(date) {
++            var dayDisabled = jQuery.inArray(date.getTime() / 1000, settings.dayDisable) != -1;
++            var weekdayDisabled = jQuery.inArray(date.getDay(), settings.weekdayDisable) != -1;
++
++            return [!(dayDisabled || weekdayDisabled), '', ''];
++          };
++        }
++
++        $(this).datepicker(settings);
+       }
+-    });
+-  }
++    }
++  });
++
++  $('input.date-popup-time:not(.date-popup-processed)', context).each(function() {
++    var inputid = $(this).addClass('date-popup-processed')[0].id;
++    if (datePopup[inputid]) {
++      var settings = datePopup[inputid].settings;
++      var func = datePopup[inputid].func;
++
++      // Explicitely filter the methods we accept.
++      if (func == 'timeEntry') {
++        $(this).timeEntry(settings);
++      }
++    }
++  });
+ };
+diff --git a/date_popup/date_popup.module b/date_popup/date_popup.module
+--- a/date_popup/date_popup.module
++++ b/date_popup/date_popup.module
+@@ -116,31 +116,13 @@
+   static $js_added = FALSE;
+   static $id_count = array();
+ 
+-  // Make sure popup date selector grid is in correct year.
+-  if (!empty($settings['yearRange'])) {
+-    $parts = explode(':', $settings['yearRange']);
+-    // Set the default date to 0 or the lowest bound if the date ranges do not include the current year
+-    // Necessary for the datepicker to render and select dates correctly
+-    $defaultDate = ($parts[0] > 0 || 0 > $parts[1]) ? $parts[0] : 0;
+-
+-    // The 1.7 version of datepicker renders the range of year options 
+-    // relative to the drawn year in the popup, and will re-render the options 
+-    // whenever the year changes.
+-    if (strpos(jquery_ui_get_version(), '1.7') === 0 && ($parts[0] >= 0 || 0 >= $parts[1])) {
+-      $range = max($parts) - min($parts);
+-      $defaultDate = $parts[0];
+-      $settings['yearRange'] = '-' . $range . ':' . '+' . $range;
+-    }
+-    $settings += array('defaultDate' => (string) $defaultDate . 'y');
+-	}
+-
+   if (!$js_added) {
+     drupal_add_js(drupal_get_path('module', 'date_popup') .'/date_popup.js');
+     $js_added = TRUE;
+   }
+ 
+   // We use a static array to account for possible multiple form_builder()
+-  // calls in the same request (form instance on 'Preview').
++  // calls in the same request (for instance on 'Preview').
+   if (!isset($id_count[$id])) {
+     $id_count[$id] = 0;
+   }
+@@ -190,6 +172,27 @@
+  *   The number of years to go back and forward in a year selector,
+  *   default is -3:+3 (3 back and 3 forward).
+  *
++ * #date_date_min
++ *   The minimum selectable date. Give a timestamp or string
++ *   that is parseable by strtotime.
++ *
++ * #date_date_max
++ *   The maximum selectable date. Give a timestamp or string
++ *   that is parseable by strtotime.
++ *
++ * #date_weekday_disable
++ *   Unselectable weekdays. Give an array of integers, where 0 is
++ *   Sunday, 1 is Monday, etc.
++ *
++ * #date_day_disable
++ *   Unselectable days. Give an array of timestamps or strings
++ *   that are parseable by strtotime.
++ * 
++ * #date_datepicker_attributes
++ *   Additional ui.datepicker attributes can be supplied in this 
++ *   attribute. See http://docs.jquery.com/UI/Datepicker
++ *   Example:
++ *     array('changeFirstDay' => FALSE)
+  */
+ function date_popup_elements() {
+   return array(
+@@ -200,6 +203,11 @@
+       '#date_format' => variable_get('date_format_short', 'm/d/Y - H:i'),
+       '#date_increment' => 1,
+       '#date_year_range' => '-3:+3',
++      '#date_date_min' => NULL,
++      '#date_date_max' => NULL,
++      '#date_weekday_disable' => array(),
++      '#date_day_disable' => array(),
++      '#date_datepicker_attributes' => array(),
+       '#process' => array('date_popup_process'),
+       ),
+     );
+@@ -221,7 +229,7 @@
+  */
+ function date_popup_process($element, $edit, $form_state, $form) {
+   date_popup_load();
+-  require_once('./'. drupal_get_path('module', 'date_api') .'/date_api_elements.inc');
++  module_load_include('inc', 'date_api', 'date_api_elements.inc');
+ 
+   $date = NULL;
+   $granularity = date_format_order($element['#date_format']);
+@@ -261,12 +269,24 @@
+   $date_format = (date_limit_format($element['#date_format'], $date_granularity));
+   if (empty($date_granularity)) return array();
+   
+-  // The datepicker can't handle zero or negative values like 0:+1
+-  // even though the Date API can handle them, so rework the value
+-  // we pass to the datepicker to use defaults it can accept (such as +0:+1)
+-  // date_range_string() adds the necessary +/- signs to the range string.
++  // Calculate an absolute year range
+   $range = date_range_years($element['#date_year_range'], $date);
+-  $year_range = date_range_string($range);
++  $year_range = $range[0] .':'. $range[1];
++  $default_date = (floor(($range[0] + $range[1]) / 2) - date('Y')) .'y';
++
++  // Preprocess minDate and maxDate
++  $element['#date_date_min'] = date_popup_parse_date($element['#date_date_min']);
++  $element['#date_date_max'] = date_popup_parse_date($element['#date_date_max']);
++
++  // Preprocess the disabled days
++  $disabledDays = array();
++  foreach($element['#date_day_disable'] as $day) {
++    $day = date_popup_parse_date($day);
++    if ($day !== NULL) {
++      $disabledDays[] = $day;
++    }
++  }
++  $element['#date_day_disable'] = $disabledDays;
+ 
+   $settings = array(
+     'prevText' => '&laquo;',
+@@ -282,26 +302,46 @@
+     'dayNamesMin' => date_week_days_abbr(TRUE, TRUE, 2),
+     'monthNames' => array_values(date_month_names(TRUE)),
+     'monthNamesShort' => array_values(date_month_names_abbr(TRUE)),
+-    //'buttonImage' => base_path() . drupal_get_path('module', 'date_api') ."/images/calendar.png",
+-    //'buttonImageOnly' => TRUE,
++    'buttonImage' => base_path() . drupal_get_path('module', 'date_api') ."/images/calendar.png",
++    'buttonImageOnly' => TRUE,
++    'showOn' => 'button',
++    'mandatory' => isset($element['#required']) && $element['#required'],
++    'showButtonPanel' => TRUE,
+     'autoPopUp' => 'focus',
+     'closeAtTop' => FALSE,
+     'speed' => 'immediate',
+     'dateFormat' => date_popup_format_to_popup($date_format, 'datepicker'),
+     'yearRange' => $year_range,
++    'minDate' => $element['#date_date_min'],
++    'maxDate' => $element['#date_date_max'],
++    'hideIfNoPrevNext' => TRUE,
+     // Custom setting, will be expanded in Drupal.behaviors.date_popup()
+     'fromTo' => isset($fromto),
+-    );    
+-  
++    'weekdayDisable' => $element['#date_weekday_disable'],
++    'dayDisable' => $disabledDays,
++    'defaultDate' => $default_date,
++    );
++
++  // Additional attributes override defaults
++  foreach ($element['#date_datepicker_attributes'] as $key => $value) {
++    $settings[$key] = $value;
++  }
++
+   // Create a unique id for each set of custom settings.
+   $id = date_popup_js_settings_id($element['#id'], 'datepicker', $settings);
++  $attributes = $element['#attributes'];
++  if (isset($attributes['class'])) {
++    $attributes['class'] .= ' date-popup-date';
++  } else {
++    $attributes['class'] = 'date-popup-date';
++  }
+   $sub_element = array(
+     '#type' => 'textfield',
+     '#default_value' => (!empty($element['#value']['date']) || !empty($edit['date'])) && is_object($date) ? date_format_date($date, 'custom', $date_format) : '',
+-    '#id' => $id,    
++    '#id' => $id,
+     '#size' => !empty($element['#size']) ? $element['#size'] : 20,
+     '#maxlength' => !empty($element['#maxlength']) ? $element['#maxlength'] : 30,
+-    '#attributes' => $element['#attributes'],
++    '#attributes' => $attributes,
+     );
+   // Views exposed filters are treated as submitted even if not,
+   // so force the #default value in that case.  
+@@ -339,6 +379,7 @@
+     '#id' => $id,
+     '#size' => 10,
+     '#maxlength' => 10,
++    '#attributes' => array('class' => 'date-popup-time'),
+     );
+   // Views exposed filters are treated as submitted even if not,
+   // so force the #default value in that case.  
+@@ -387,14 +428,35 @@
+     return;
+   }
+ 
+-  require_once('./'. drupal_get_path('module', 'date_api') .'/date_api_elements.inc');
++  module_load_include('inc', 'date_api', 'date_api_elements.inc');
+   date_popup_load();
+   $value = date_popup_input_value($element);
+   
+   // If the created date is valid, set it.
+   if (!empty($value)) {
+-    form_set_value($element, $value, $form_state);
+-    return;
++    // check restrictions
++    $valuestamp = strtotime($value);
++    $message = '';
++    if ($element['#date_date_min'] !== NULL && $valuestamp < $element['#date_date_min']) {
++      $message = t('Field %field is invalid.', array('%field' => $label));
++    }
++    elseif ($element['#date_date_max'] !== NULL && $valuestamp > $element['#date_date_max']) {
++      $message = t('Field %field is invalid.', array('%field' => $label));
++    }
++    elseif (in_array(date('w', $valuestamp), $element['#date_weekday_disable'])) {
++      $message = t('Field %field is invalid.', array('%field' => $label));
++    }
++    elseif (in_array($valuestamp, $element['#date_day_disable'])) {
++      $message = t('Field %field is invalid.', array('%field' => $label));
++    }
++
++    if ($message != '') {
++      form_set_error($error_field .'][date', $message);
++    }
++    else {
++      form_set_value($element, $value, $form_state);
++      return;
++    }
+   }
+   else {
+     // Set message on both date and time to get them highlighted properly.
+@@ -573,6 +635,31 @@
+ }
+ 
+ /**
++ * Parses a date to the following rules:
++ * - An int is returned as-is
++ * - A string is converter to an int if it contains only numbers
++ * - Other strings are parsed with strtotime and the result
++ *   is returned if it is valid
++ * - Otherwise: NULL is returned
++ */
++function date_popup_parse_date($input) {
++  if (is_int($input)) {
++    return $input;
++  }
++  if (is_string($input) && preg_match('#^\d+$#', $input)) {
++    return intval($input);
++  }
++  if (is_string($input)) {
++    $tmp = strtotime($input);
++    if ($tmp !== FALSE && $tmp !== -1) {
++      return $tmp;
++    }
++  }
++
++  return NULL;
++}
++
++/**
+  * Format a date popup element.
+  *
+  * Use a class that will float date and time next to each other.
+diff --git a/date_popup/themes/datepicker.css b/date_popup/themes/datepicker.css
+--- a/date_popup/themes/datepicker.css
++++ b/date_popup/themes/datepicker.css
+@@ -1,37 +1,30 @@
++/* Drupal Custom */
++.ui-datepicker-div, .ui-datepicker-inline a, #ui-datepicker-div a {
++  text-decoration: none;
++}
++
++.ui-datepicker-div, .ui-datepicker-inline tbody, #ui-datepicker-div tbody {
++  border: 0px;
++}
++
+ /* Smoothness Theme for jQuery UI Datepicker */
+-#ui-datepicker-div table,
+-#ui-datepicker-div td,
+-#ui-datepicker-div th {
+-  margin: 0;
+-  padding: 0;
+-}
+-#ui-datepicker-div,
+-#ui-datepicker-div table,
+-.ui-datepicker-div,
+-.ui-datepicker-div table,
+-.ui-datepicker-inline,
+-.ui-datepicker-inline table {
+-  font-size: 12px !important;
+-}
+ .ui-datepicker-div, .ui-datepicker-inline, #ui-datepicker-div {
+   /*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+-  background: #ffffff;
+-  border: 2px solid #d3d3d3;
+-  font-family: Verdana, Arial, sans-serif;
++  font-family: Verdana,Arial,sans-serif;
++  background: #ffffff url(images/ffffff_40x100_textures_01_flat_75.png) 0 0 repeat-x;
+   font-size: 1.1em;
+-  margin: 0;
++  border: 4px solid #aaaaaa;
++  width: 15.5em;
+   padding: 2.5em .5em .5em .5em;
+   position: relative;
+-  width: 15.5em;
+ }
+-#ui-datepicker-div {
+-  background: #ffffff;
++.ui-datepicker-div, #ui-datepicker-div {
++  z-index: 9999; /*must have*/
+   display: none;
+-  z-index: 9999; /*must have*/
+ }
+ .ui-datepicker-inline {
++  float: left;
+   display: block;
+-  float: left; /* LTR */
+ }
+ .ui-datepicker-control {
+   display: none;
+@@ -40,98 +33,103 @@
+   display: none;
+ }
+ .ui-datepicker-next, .ui-datepicker-prev {
+-  background: #e6e6e6 url(images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x; /* LTR */
+-  left: .5em; /* LTR */
+   position: absolute;
++  left: .5em;
+   top: .5em;
++  background: #e6e6e6 url(images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+ }
+ .ui-datepicker-next {
+   left: 14.6em;
+ }
+ .ui-datepicker-next:hover, .ui-datepicker-prev:hover {
+-  background: #dadada url(images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x; /* LTR */
++  background: #dadada url(images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+ }
+ .ui-datepicker-next a, .ui-datepicker-prev a {
+-  background: url(images/888888_7x7_arrow_left.gif) 50% 50% no-repeat; /* LTR */
++  text-indent: -999999px;
++  width: 1.3em;
++  height: 1.4em;
++  display: block;
++  font-size: 1em;
++  background: url(images/888888_7x7_arrow_left.gif) 50% 50% no-repeat;
+   border: 1px solid #d3d3d3;
+   cursor: pointer;
+-  display: block;
+-  font-size: 1em;
+-  height: 1.4em;
+-  text-indent: -999999px;
+-  width: 1.3em;
+ }
+ .ui-datepicker-next a {
+-  background: url(images/888888_7x7_arrow_right.gif) 50% 50% no-repeat; /* LTR */
++  background: url(images/888888_7x7_arrow_right.gif) 50% 50% no-repeat;
+ }
+ .ui-datepicker-prev a:hover {
+-  background: url(images/454545_7x7_arrow_left.gif) 50% 50% no-repeat; /* LTR */
++  background: url(images/454545_7x7_arrow_left.gif) 50% 50% no-repeat;
+ }
+ .ui-datepicker-next a:hover {
+-  background: url(images/454545_7x7_arrow_right.gif) 50% 50% no-repeat; /* LTR */
++  background: url(images/454545_7x7_arrow_right.gif) 50% 50% no-repeat;
+ }
+ .ui-datepicker-prev a:active {
+-  background: url(images/222222_7x7_arrow_left.gif) 50% 50% no-repeat; /* LTR */
++  background: url(images/454545_7x7_arrow_left.gif) 50% 50% no-repeat;
+ }
+ .ui-datepicker-next a:active {
+-  background: url(images/222222_7x7_arrow_right.gif) 50% 50% no-repeat; /* LTR */
++  background: url(images/454545_7x7_arrow_right.gif) 50% 50% no-repeat;
+ }
+ .ui-datepicker-header select {
+-  background: #e6e6e6;
+   border: 1px solid #d3d3d3;
+   color: #555555;
++  background: #e6e6e6;
+   font-size: 1em;
+   line-height: 1.4em;
+-  margin: 0 !important;
+-  padding: 0 !important;
+   position: absolute;
+   top: .5em;
++  margin: 0 !important;
++}
++.ui-datepicker-header option:focus, .ui-datepicker-header option:hover {
++  background: #dadada;
+ }
+ .ui-datepicker-header select.ui-datepicker-new-month {
+-  left: 2.2em; /* LTR */
+   width: 7em;
++  left: 2.2em;
+ }
+ .ui-datepicker-header select.ui-datepicker-new-year {
+-  left: 9.4em; /* LTR */
+   width: 5em;
++  left: 9.4em;
+ }
+ table.ui-datepicker {
+-  text-align: right; /* LTR */
+   width: 15.5em;
++  text-align: right;
+ }
+ table.ui-datepicker td a {
++  padding: .1em .3em .1em 0;
++  display: block;
+   color: #555555;
+-  display: block;
+-  padding: .1em .3em .1em 0; /* LTR */
+-  text-decoration: none;
++  background: #e6e6e6 url(images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
++  cursor: pointer;
++  border: 1px solid #ffffff;
+ }
+-table.ui-datepicker tbody {
+-  border-top: none;
+-}
+-table.ui-datepicker tbody td a {
+-  background: #e6e6e6 url(images/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x; /* LTR */
+-  border: 1px solid #ffffff;
+-  cursor: pointer;
+-}
+-table.ui-datepicker tbody td a:hover {
+-  background: #dadada url(images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x; /* LTR */
++table.ui-datepicker td a:hover {
+   border: 1px solid #999999;
+   color: #212121;
++  background: #dadada url(images/dadada_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+ }
+-table.ui-datepicker tbody td a:active {
+-  background: #ffffff url(images/ffffff_40x100_textures_02_glass_65.png) 0 50% repeat-x; /* LTR */
+-  border: 1px solid #dddddd;
++table.ui-datepicker td a:active {
++  border: 1px solid #aaaaaa;
++  color: #212121;
++  background: #ffffff url(images/ffffff_40x100_textures_02_glass_65.png) 0 50% repeat-x;
++}
++table.ui-datepicker .ui-datepicker-title-row td {
++  padding: .3em 0;
++  text-align: center;
++  font-size: .9em;
++  color: #222222;
++  text-transform: uppercase;
++}
++table.ui-datepicker .ui-datepicker-title-row td a {
+   color: #222222;
+ }
+-table.ui-datepicker .ui-datepicker-title-row td {
+-  /*border-bottom: 1px solid #d3d3d3;*/
+-  color: #222222;
+-  font-size: .9em;
+-  padding: .3em 0;
+-  text-align: center;
+-  text-transform: uppercase;
+-}
+-
+-table.ui-datepicker .ui-datepicker-title-row td a {
+-  color: #222222;
++.ui-datepicker-cover {
++  display: none;
++  display/**/: block;
++  position: absolute;
++  z-index: -1;
++  filter: mask();
++  top: -4px;
++  left: -4px;
++  width: 193px;
++  height: 200px;
+ }
+\ No newline at end of file

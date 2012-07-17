@@ -1,0 +1,25 @@
+/* $Id$ */
+
+.front-panel .panel-panel {
+	display: block;
+	float: left;
+}
+
+.front-panel .panel-panel.panel-col-last {
+	width: 29%;
+	margin: 0 0 0 1%;
+	padding: 0;
+	overflow: hidden;
+}
+
+.front-panel .panel-panel.panel-col-first {
+	width: 70%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.page-admin .front-panel .panel-panel.panel-col-last,
+.page-admin .front-panel .panel-panel.panel-col-first{
+	overflow: visible;
+}

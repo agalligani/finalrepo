@@ -1,0 +1,45 @@
+diff --git -p a/modules/og_views/og_views.views.inc b/modules/og_views/og_views.views.inc
+--- a/modules/og_views/og_views.views.inc	17 Aug 2010 19:34:53 -0000	1.13.4.13
++++ b/modules/og_views/og_views.views.inc	28 Oct 2010 18:52:20 -0000
+@@ -14,6 +14,9 @@ function og_views_views_handlers() {
+       'og_views_handler_filter_og_group_nid' => array(
+         'parent' => 'views_handler_filter_many_to_one',
+       ),
++      'og_views_handler_filter_og_uid_nid' => array(
++        'parent' => 'views_handler_filter_many_to_one',
++      ),
+       'og_views_handler_filter_og_type_all' => array(
+         'parent' => 'views_handler_filter',
+       ),
+@@ -407,7 +410,11 @@ function og_views_data_og_uid() {
+       'handler' => 'og_views_handler_argument_og_uid_nid',
+       'help' => t('<strong>Members</strong> are filtered for a specific group.'),
+     ),
+-  );
++    'filter' => array(
++      'handler' => 'og_views_handler_filter_og_uid_nid',
++      'help' => t('OG: Members that belong to a group'),
++    ),
++  );   
+   $data['og_uid']['groups'] = array(
+     'title' => t('User\'s groups'),
+     'help' => t('Groups that a member belongs to.'),
+@@ -420,6 +427,7 @@ function og_views_data_og_uid() {
+   $data['og_uid']['uid'] = array(
+     'title' => t('Group member'),
+     // 'help' => t('foo')
++    'field' => 'nid',
+     'filter' => array(
+       'handler' => 'views_handler_filter_user_current',
+       'help' => t("OG: Group in current user's groups"),
+diff --git a/modules/og_views/includes/og_views_handler_filter_og_uid_nid.inc b/modules/og_views/includes/og_views_handler_filter_og_uid_nid.inc
+new file mode 100644
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ b/modules/og_views/includes/og_views_handler_filter_og_uid_nid.inc	28 Oct 2010 18:52:20 -0000
+@@ -0,0 +1,6 @@
++<?php
++class og_views_handler_filter_og_uid_nid extends views_handler_filter_many_to_one {
++  function get_value_options() {
++    $this->value_options = og_all_groups_options();
++  }
++}

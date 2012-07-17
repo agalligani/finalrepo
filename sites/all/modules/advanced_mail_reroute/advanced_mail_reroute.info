@@ -1,0 +1,13 @@
+; $Id: advanced_mail_reroute.info,v 1.1.2.2 2009/04/30 06:15:02 rohinknight Exp $
+name = Advanced mail reroute
+description = Reroute E-mails based on specific rules.
+package = Catalyst
+core = 6.x
+version = 6.x-1.0
+
+; Information added by drupal.org packaging script on 2009-05-12
+version = "6.x-1.2"
+core = "6.x"
+project = "advanced_mail_reroute"
+datestamp = "1242168603"
+

@@ -1,0 +1,12 @@
+<?php
+; $Id: duplicate_role.info,v 1.3 2009/10/08 15:01:39 alexgon Exp $
+name = "Duplicate Role"
+description = "A module that duplicates an existing role and its permissions."
+core = 6.x
+?>
+; Information added by drupal.org packaging script on 2009-10-08
+version = "6.x-1.0"
+core = "6.x"
+project = "duplicate_role"
+datestamp = "1255014353"
+

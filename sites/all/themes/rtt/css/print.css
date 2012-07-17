@@ -1,0 +1,26 @@
+/**
+ * New print.css for foliage
+ */
+
+body {
+   background: white;
+   font: 12pt times, serif;
+   }
+#header-group-wrapper, #footer-wrapper {
+   display: none;
+   }  
+#main-wrapper {
+   width: auto;
+   padding: 0;
+   border: 0;
+   float: none;
+   color: black;
+   background: transparent none;
+}
+div#main-wrapper {
+   padding-top: 1em;
+   border-top: 1px solid #930;
+   }
+.print-link {
+	text-decoration:none;
+}

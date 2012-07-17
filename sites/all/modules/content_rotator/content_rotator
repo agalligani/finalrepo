@@ -1,0 +1,155 @@
+<?php
+
+/*
+ * Implements hook_init
+ */
+
+function content_rotator_init(){
+  drupal_add_css(drupal_get_path('module', 'content_rotator') .'/content_rotator.css');
+  drupal_add_js(drupal_get_path('module', 'content_rotator') .'/content_rotator.js');
+}
+
+
+/* 
+ * Implements hook_menu
+ */
+ 
+function content_rotator_menu() {
+	$items = array();
+	
+	$items['panel_bios'] = array(
+		'title' => t(''),
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'panel_bios',
+		'page arguments' => array(1),
+		'access callback' => TRUE,                  
+		'description'	=> t('Find duplicate contact emails'),
+	); 
+	return $items;
+ }
+ 
+ 
+function panel_bios($alpha = '') {
+
+
+
+
+
+//if running from the mayfirst server, uncomment these settings
+//comment the local settings
+
+//* mayfirst settings   *// 
+
+/*
+$server = 'albizu.mayfirst.org'; //or localhost if you are running it off of albizu 
+$user  = 'lf_civicrm';
+$pw  = 'LO26EfUV';
+$db_name = 'leftforum_civicrm';
+*/
+
+//* end mayfirst settings *//
+
+
+
+//if running from the local pc, uncomment these settings
+//* local settings   *// 
+
+$server = 'localhost';
+$user 	= 'root2';
+$pw 	= 'civicrm';
+$db_name = 'civi';
+
+//* end local settings *//
+
+
+
+// connect to server
+$link = mysql_connect($server, $user, $pw);
+if (!$link) { die('Could not connect: ' . mysql_error()); }
+
+// connect to the database
+$db = mysql_select_db($db_name);
+if (!$db) { die('Database connect error: '.mysql_error()); }
+
+// construct query which finds duplicate (more than one) emails and pulls the name info
+// from the contacts table
+$where_clause =	$alpha==''?"":" where substr(email,1,1) = '".$alpha."'";
+
+$sql_1 = "select 
+		a.email,
+		a.contact_id,
+		b.sort_name,
+		b.display_name
+		from civicrm_email as a, 
+		civicrm_contact as b 
+		WHERE (a.contact_id = b.id)
+		AND a.email in (		select 
+		email		
+		from civicrm_email ".$where_clause.
+		"group by email
+		having count(*) > 1)
+		order by a.email		
+		";
+		
+//run query - check success		
+$result = mysql_query($sql_1);
+if (!$result) { die('Invalid query: ' . mysql_error()); }
+
+
+//build the query results table
+
+
+
+// get alpha tab menu and add the row header
+$page = alpha_menu();
+
+// @todo - make the header prettier
+$hdr_format = '<div class=\'row_wrapper %s\'><div class=\'cell email\'>%s</div><div class=\'cell sort_name\'>%s</div><div class=\'cell display_name\'>%s</div></div>';
+
+$page .= sprintf($hdr_format, 'row_header', "Email", "Sort Name", "Display Name" );
+
+$row_class = 'even';
+$row_format = '<div class=\'row_wrapper %s\'>'.					
+					'<div class=\'cid\' id=\'%s\'></div>'.
+					'<div class=\'cell email\'>%s</div>'.
+					'<div class=\'cell sort_name\'>%s</div>'.
+					'<div class=\'cell display_name\'>%s</div>'.
+				'</div>';
+
+// loop results and build the display table
+
+$prev_email = '';
+$group_ender = '';
+
+while ($row = mysql_fetch_assoc($result)) {
+	$page .= ($prev_email == $row['email'])? "":$group_ender."<div class='grouping' id='".$row['email']."'>";
+	$row_class = ($row_class == 'odd')?"even":"odd"; // change zebra stripe
+    $page .= sprintf($row_format, $row_class, $row['contact_id'], $row['email'], $row['sort_name'], $row['display_name'] );
+	$prev_email = $row['email'];
+	$group_ender = '</div>'; //reset after first group
+}
+    $page .= $group_ender; //should be blank anyway if there were no rows...
+mysql_free_result($result);		
+mysql_close($link);
+
+$page .= "";
+
+
+return $page;
+
+ }
+ 
+
+// create the list of alpha tabs...
+ 
+ function alpha_menu() {
+	$alpha_menu = '<div id=\'alpha_list\'>';
+	$alpha_menu .='<a class=\'alpha_link_1\' href=\''.base_path().'civi_dedupe\'>All</a>';
+
+	for($i=0;$i<26;$i++){
+
+		$alpha 		 = substr('abcdefghijklmnopqrstuvwxyz',$i,1);
+		$alpha_menu .='<a class=\'alpha_link\' href=\''.base_path().'civi_dedupe/'.$alpha.'\'>'.$alpha.'</a>';
+	}
+	return $alpha_menu.'</div>';
+ }

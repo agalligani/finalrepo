@@ -1,0 +1,7 @@
+; $Id: 
+name = "Content Rotator"
+description = "Add Content Rotators"
+package = "Maher and Maher"
+core = 6.x
+; Add a style sheet for all media
+stylesheets[all][] = content_rotator.css

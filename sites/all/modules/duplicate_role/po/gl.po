@@ -1,0 +1,68 @@
+﻿# $Id: gl.po,v 1.2 2009/10/08 15:01:39 alexgon Exp $
+#
+# Galician translation of Drupal (general)
+# Copyright 2008 Alejandro Gonzalez (alexgon)  <EMAIL@ADDRESS>
+# Generated from files:
+#  duplicate_role.module: n/a
+#  duplicate_role.info: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2008-11-24 19:04+0100\n"
+"PO-Revision-Date: 2008-11-24 19:04+0100\n"
+"Last-Translator: Alejandro Gonzalez (alexgon)  <EMAIL@ADDRESS>\n"
+"Language-Team: Galician <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: duplicate_role.module:16
+msgid "Duplicate an existing role with the same permissions for modules and taxonomies as the original ones"
+msgstr "Fai unha copia dun rol existente, establecendo os mesmos permisos para o novo rol, tanto os permisos de m&oacute;dulos como os das categor&iacute;as"
+
+#: duplicate_role.module:37 duplicate_role.info:0
+msgid "Duplicate Role"
+msgstr "Copiar Rol"
+
+#: duplicate_role.module:38 duplicate_role.info:0
+msgid "A module that duplicates an existing role and its permissions."
+msgstr "Copia un rol existente e os seus permisos"
+
+#: duplicate_role.module:103
+msgid "New role added successfully."
+msgstr "Rol engadido con &eacute;xito"
+
+#: duplicate_role.module:114
+msgid "-- Please Select One --"
+msgstr "-- Escolle o rol a copiar --"
+
+#: duplicate_role.module:120
+msgid "Choose role to duplicate"
+msgstr "Escolle o rol que queres copiar"
+
+#: duplicate_role.module:122
+msgid "Select role to duplicate"
+msgstr "Selecciona o rol existente que queres copiar"
+
+#: duplicate_role.module:127
+msgid "New role"
+msgstr "Novo rol"
+
+#: duplicate_role.module:132
+msgid "New role name"
+msgstr "Nome do novo rol"
+
+#: duplicate_role.module:137
+msgid "Create new role"
+msgstr "Crear novo rol"
+
+#: duplicate_role.module:27
+msgid "access duplicate role"
+msgstr "acceso a duplicar rol"
+
+#: duplicate_role.module:0
+msgid "duplicate_role"
+msgstr "duplicar rol"
+

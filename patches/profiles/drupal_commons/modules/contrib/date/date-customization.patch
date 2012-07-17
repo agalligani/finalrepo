@@ -1,0 +1,29 @@
+diff --git a/date_popup/date_popup.module b/date_popup/date_popup.module
+--- a/date_popup/date_popup.module
++++ b/date_popup/date_popup.module
+@@ -200,14 +200,23 @@
+       '#input' => TRUE,
+       '#tree' => TRUE,
+       '#date_timezone' => date_default_timezone_name(),
+-      '#date_format' => variable_get('date_format_short', 'm/d/Y - H:i'),
++      '#date_format' => variable_get('date_format_short', 'd/m/Y - H:i'),
+       '#date_increment' => 1,
+       '#date_year_range' => '-3:+3',
+       '#date_date_min' => NULL,
+       '#date_date_max' => NULL,
+       '#date_weekday_disable' => array(),
+       '#date_day_disable' => array(),
+-      '#date_datepicker_attributes' => array(),
++      '#date_datepicker_attributes' => array(
++          'prevText' => '&lt;Prev',
++          'nextText' => 'Next&gt;',
++          'monthNamesShort' => array_values(date_month_names(TRUE)),
++          'buttonImageOnly' => FALSE,
++          'buttonText' => 'Click to select date',
++          'closeText' => 'Close',
++          'showOn' => 'button',
++          'appendText' => ''
++      ),
+       '#process' => array('date_popup_process'),
+       ),
+     );

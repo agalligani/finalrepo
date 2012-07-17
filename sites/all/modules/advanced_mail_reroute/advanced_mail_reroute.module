@@ -1,0 +1,421 @@
+<?php
+// $Id: advanced_mail_reroute.module,v 1.1.2.3 2009/05/12 22:40:29 rohinknight Exp $
+
+/**
+ * @file
+ * Reroute E-mails based on specific rules.
+ */
+//=============================================================================
+//                          Constant Initalization
+//=============================================================================
+define(ADVANCED_MAIL_REROUTE_ALLOW, 0);
+define(ADVANCED_MAIL_REROUTE_BLOCK, 1);
+define(ADVANCED_MAIL_REROUTE_REROUTE, 2);
+define(ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED, 3);
+
+//=============================================================================
+//                           Hook Implementations
+//=============================================================================
+/**
+ * Implementation of hook_menu()
+ */
+function advanced_mail_reroute_menu() {
+  $items = array();
+  $items['admin/settings/mail_reroute_rules'] = array(
+    'title' => 'Mail reroute rules',
+    'description' => t('Configure which mail will be allowed through, blocked or rerouted'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('advanced_mail_reroute_settings_form'),
+    'access arguments' => array('administer advanced mail reroute')
+  );
+  $items['admin/reports/mail_reroute_log'] = array(
+    'title' => 'Mail reroute log',
+    'description' => t('View which mail was allowed through, blocked or rerouted'),
+    'page callback' => 'advanced_mail_reroute_view_log',
+    'access arguments' => array('administer advanced mail reroute')
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_help()
+ */
+function advanced_mail_reroute_help($section='') {
+  $output = '';
+  
+  switch ($section) {
+    case "admin/help#advanced_mail_reroute":  // TODO: Write help
+      $output = '<p>'. t("Redirects certain mail to the admin when website is not in production mode") .'</p>';
+      break;
+  }
+  
+  return $output;
+}
+
+/**
+ * Implementation of hook_theme
+ */
+function advanced_mail_reroute_theme($existing, $type, $theme, $path) {
+  return array(
+    'advanced_mail_reroute_table' => array(
+      'arguments' => array('element' => NULL),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_perm()
+ */
+function advanced_mail_reroute_perm() {
+    return array('administer advanced mail reroute');
+}
+
+/**
+ * Implementation of hook_elements()
+ */
+function advanced_mail_reroute_elements() {
+  return array(
+    'advanced_mail_reroute_table' => array(
+      '#input' => TRUE,
+      '#process' => array('advanced_mail_reroute_table_process'),
+      '#element_validate' => array('advanced_mail_reroute_table_validate') 
+    )
+  );
+}
+
+/**
+ * Implementation of hook_mail_alter()
+ */
+function advanced_mail_reroute_mail_alter(&$message) {  
+  $num_rows = db_result(db_query("SELECT COUNT(*) FROM {advanced_mail_reroute_rules} WHERE mailkey='%s'", $message['id']));
+  
+  // fetch or create new rule
+  if ($num_rows > 0) {
+    $result = db_query("SELECT reroute_rule, email FROM {advanced_mail_reroute_rules} WHERE mailkey='%s'", $message['id']);
+    $rule = db_fetch_array($result);
+  }
+  else {
+    $rule = array(
+      'reroute_rule' => variable_get('advanced_mail_reroute_default_rule', ADVANCED_MAIL_REROUTE_ALLOW),
+      'email' => ''
+    );
+        
+    db_query("INSERT INTO {advanced_mail_reroute_rules} (mailkey, reroute_rule, email) VALUES ('%s', %d, '')", $message['id'], $rule['reroute_rule']);
+  }
+
+  // apply override rule
+  $reroute_override_rule = variable_get('advanced_mail_reroute_override', ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED);
+  if ($reroute_override_rule != ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED) {
+    $rule['reroute_rule'] = $reroute_override_rule;
+    
+    if ($rule['reroute_rule'] == ADVANCED_MAIL_REROUTE_REROUTE) {
+      $rule['email'] = variable_get('advanced_mail_reroute_primary_email', variable_get('site_mail', NULL));
+    }
+  }
+  else if ($rule['reroute_rule'] == ADVANCED_MAIL_REROUTE_REROUTE && empty($rule['email'])) {
+    $rule['email'] = variable_get('advanced_mail_reroute_primary_email', variable_get('site_mail', NULL));
+  }
+
+  // log message
+  if (variable_get('advanced_mail_reroute_log_enabled', TRUE)) {
+    _advanced_mail_reroute_log($message['id'], $message['from'], $message['to'], $rule['reroute_rule'], $rule['email']);
+  }
+  
+  // perform action
+  switch ($rule['reroute_rule']) {
+    case ADVANCED_MAIL_REROUTE_ALLOW:
+      break;
+    case ADVANCED_MAIL_REROUTE_BLOCK:
+      $message['to'] = NULL;
+      break;
+    case ADVANCED_MAIL_REROUTE_REROUTE:
+      _advanced_mail_reroute_reroute($message, $rule['email']);
+      break;
+  }
+}
+
+//=============================================================================
+//                           Callback Functions
+//=============================================================================
+function advanced_mail_reroute_settings_form() {  
+  drupal_add_js(drupal_get_path('module', 'advanced_mail_reroute') .'/advanced_mail_reroute.js');
+
+  $override_value_to_index = array(
+    ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED => 0,
+    ADVANCED_MAIL_REROUTE_ALLOW => 1,
+    ADVANCED_MAIL_REROUTE_BLOCK => 2,
+    ADVANCED_MAIL_REROUTE_REROUTE => 3
+  );
+  
+  $override_value = variable_get('advanced_mail_reroute_override', ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED);
+
+  $form['#tree'] = TRUE;
+  
+  $form['main_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Main settings'),
+    '#collapsible' => TRUE
+  );
+  $form['main_settings']['override'] = array(
+    '#type' => 'select',
+    '#title' => t('Override rule'),
+    '#options' => array(t('- Disabled -'), t('Allow all emails through'), t('Block all emails'), t('Redirect all emails to primary email address')),
+    '#default_value' => $override_value_to_index[$override_value],
+    '#description' => t('This will override any settings in the Mailkey rules table')
+  );
+  $form['main_settings']['primary_email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Primary E-mail'),
+    '#default_value' => variable_get('advanced_mail_reroute_primary_email', variable_get('site_mail', '')),
+    '#description' => t('By default all E-mails will be sent to this address'),
+  );
+  $form['main_settings']['enable_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable logging'),
+    '#default_value' => variable_get('advanced_mail_reroute_enable_logging', TRUE),
+  );
+  
+  $mailkey_rules_description = t('This table is automatically updated as new mailkeys are discovered.');
+  
+  if (variable_get('advanced_mail_reroute_override', ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED) != ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED) {
+    $mailkey_rules_description .= ' <div style="color: red; display: block;">'. t('Override is currently enabled. All rules below will be ignored.') .'</div>';
+  }
+  
+  $form['mailkey_rules'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Reroute rules'),
+    '#collapsible' => TRUE,
+    '#description' => $mailkey_rules_description,
+  );
+  $form['mailkey_rules']['default_rule'] = array(
+    '#type' => 'select',
+    '#title' => t('Default rule for new mailkeys'),
+    '#options' =>  array('Allow', 'Block', 'Reroute'),
+    '#default_value' => variable_get('advanced_mail_reroute_default_rule', ADVANCED_MAIL_REROUTE_DEFAULT_RULE),
+  );
+  $form['mailkey_rules']['table'] = array(
+    '#type' => 'advanced_mail_reroute_table'
+  );
+  
+  $form['new_rule'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('New rule'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE
+  );
+  $form['new_rule']['mailkey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mailkey')
+  );
+  $form['new_rule']['rule'] = array(
+    '#type' => 'select',
+    '#title' => t('Rule'),
+    '#options' =>  array('Allow', 'Block', 'Reroute'),
+    '#default_value' => variable_get('advanced_mail_reroute_default_rule', ADVANCED_MAIL_REROUTE_DEFAULT_RULE),
+    '#attributes' => array('class' => 'advanced-mail-reroute-rule')
+  );
+  $form['new_rule']['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#description' => t("When reroute is selected you may enter an optional email if"),
+    '#attributes' => array('class' => 'advanced-mail-reroute-email')
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+function advanced_mail_reroute_settings_form_validate($form_id, $form_values) {
+  if (!valid_email_address($form_values['values']['main_settings']['primary_email'])) {
+    form_set_error('main_settings][primary_email', t('Invalid email entered for primary email'));
+  }
+
+  $new_rule = $form_values['values']['new_rule'];
+  
+  if (!empty($new_rule['mailkey']) && $new_rule['rule'] == ADVANCED_MAIL_REROUTE_REROUTE &&
+      !empty($new_rule['email']) && !valid_email_address($new_rule['email'])) {
+    form_set_error('new_rule][email', t('Invalid email entered for new mailkey rule'));
+  }
+  
+  
+}
+
+function advanced_mail_reroute_settings_form_submit($form_id, $form_state) {
+  $override_index_to_value = array(
+    0 => ADVANCED_MAIL_REROUTE_OVERRIDE_DISABLED,
+    1 => ADVANCED_MAIL_REROUTE_ALLOW,
+    2 => ADVANCED_MAIL_REROUTE_BLOCK,
+    3 => ADVANCED_MAIL_REROUTE_REROUTE
+  );
+  
+  $override_index = $form_state['values']['main_settings']['override'];
+  
+  variable_set('advanced_mail_reroute_override', $override_index_to_value[$override_index]);
+  variable_set('advanced_mail_reroute_primary_email', $form_state['values']['main_settings']['primary_email']);
+  variable_set('advanced_mail_reroute_enable_logging', $form_state['values']['main_settings']['enable_logging']);
+  variable_set('advanced_mail_reroute_default_rule', $form_state['values']['mailkey_rules']['default_rule']);
+
+  $new_rule = $form_state['values']['new_rule'];
+  
+  if (!empty($new_rule['mailkey'])) {
+    $email = ($new_rule['rule'] == ADVANCED_MAIL_REROUTE_REROUTE ? $new_rule['email'] : '');
+    
+    db_query("INSERT INTO {advanced_mail_reroute_rules} (mailkey, reroute_rule, email) VALUES ('%s', %d, '%s')",
+      $new_rule['mailkey'], $new_rule['rule'], $new_rule['email']);
+  }
+
+  $table = $form_state['values']['mailkey_rules']['table']['mailkeys'];
+  
+  if (!empty($table)) {
+    foreach ($table as $key => $value) {
+      if ($value['remove']) {
+        db_query("DELETE FROM {advanced_mail_reroute_rules} WHERE mailkey ='%s'", $value['mailkey']);
+      }
+      else {
+        $email = ($value['rule'] == ADVANCED_MAIL_REROUTE_REROUTE ? $value['email'] : '');
+        db_query("UPDATE {advanced_mail_reroute_rules} SET reroute_rule = %d, email = '%s' WHERE mailkey = '%s'", $value['rule'], $email, $value['mailkey']);  
+      }
+    }
+  }
+}
+
+function advanced_mail_reroute_table_process($element, $form_state) {  
+  $result = db_query('SELECT mailkey, reroute_rule, email FROM {advanced_mail_reroute_rules}');
+    
+  while ($row = db_fetch_object($result)) {
+    $element['mailkeys']['M'. $row->mailkey] = array(  // prefix with 'M' so mailkeys which begin with a '#' won't get discarded in the theme function
+      'mailkey' => array(
+        '#type' => 'hidden',
+        '#value' => $row->mailkey,
+      ),
+      'rule' => array(
+        '#type' => 'select',
+        '#options' => array('Allow', 'Block', 'Reroute'),
+        '#default_value' => $row->reroute_rule,
+        '#attributes' => array('class' => 'advanced-mail-reroute-rule')
+      ),
+      'email' => array(
+        '#type' => 'textfield',
+        '#default_value' => $row->email,
+        '#size' => 25,
+        '#attributes' => array('class' => 'advanced-mail-reroute-email')
+      ),
+      'remove' => array(
+        '#type' => 'checkbox',
+        '#default_value' => 0
+      )
+    );
+  }
+  
+  return $element;
+}
+
+function advanced_mail_reroute_table_validate($element, $form_state) {
+  if (!empty($form_state['values']['new_rule']['mailkey'])) {
+    $num_rows = db_result(db_query("SELECT COUNT(*) FROM {advanced_mail_reroute_rules} WHERE mailkey='%s'", $form_state['values']['new_rule']['mailkey']));
+  
+    if ($num_rows > 0) {
+      form_set_error('new_rule][mailkey', t('Mailkey for new rule already exists'));
+    }
+  }
+  
+  if (!empty($form_state['values']['mailkey_rules']['table']['mailkeys'])) {
+    foreach ($form_state['values']['mailkey_rules']['table']['mailkeys'] as $key => $value) {
+      if ($value['rule'] == ADVANCED_MAIL_REROUTE_REROUTE &&
+          !empty($value['email']) &&
+          !$value['remove'] &&
+          !valid_email_address($value['email'])) {
+        form_set_error($key, t("Invalid email entered for mailkey rule '". substr($key, 1) ."'"));
+      }
+    }
+  }
+}
+
+function theme_advanced_mail_reroute_table($element) {
+  if (isset($element['mailkeys'])) {
+    foreach ($element['mailkeys'] as $mailkey => $row) {
+      if ($mailkey[0] == 'M') {  // drupal inserts a lot of other stuff beginning with '#' so we want to skip past that.
+        $rows[] = array(
+          $row['mailkey']['#value'],
+          theme('select', $row['rule']),
+          theme('textfield', $row['email']),
+          theme('checkbox', $row['remove'])
+        );
+      }
+    }
+  }
+  
+  if (!isset($rows)) {
+    $rows[] = array(array('data' => t('No rules available.'), 'colspan' => 5));
+  }
+  
+  $header = array(t('Mailkey'), t('Rule'), t('E-mail'), t('Remove'));
+  $output = theme('table', $header, $rows);
+ 
+  return $output;
+}
+
+function advanced_mail_reroute_view_log() {
+  $actions = array('Allowed', 'Blocked', 'Rerouted');
+  
+  $header = array(
+    array('data' => t('Time'), 'field' => 'timestamp', 'sort' => 'desc'),
+    array('data' => t('Mailkey'), 'field' => 'mailkey'),
+    array('data' => t('From'), 'field' => 'from_email'),
+    array('data' => t('To'), 'field' => 'to_email'),
+    array('data' => t('Action'), 'field' => 'reroute_rule')
+  );
+
+  $result = pager_query("SELECT timestamp, mailkey, from_email, to_email, reroute_rule, reroute_email FROM {advanced_mail_reroute_log}"
+        . tablesort_sql($header), 30, 0, "SELECT COUNT(id) FROM {advanced_mail_reroute_log}");
+    
+  while ($row = db_fetch_object($result)) {    
+    $action_taken = $actions[$row->reroute_rule];
+    
+    if ($row->reroute_rule == ADVANCED_MAIL_REROUTE_REROUTE) {
+      $action_taken .= ' to '. $row->reroute_email;
+    }
+    
+    $rows[] = array(date('Y-m-d H:i:s', $row->timestamp), $row->mailkey, $row->from_email, $row->to_email, $action_taken);
+  }
+  
+  if (!$rows) {
+    $rows[] = array(array('data' => t('No log messages available.'), 'colspan' => 5));
+  }
+  
+  $content = theme('table', $header, $rows);
+  $content .= theme('pager', NULL, 30, 0);
+  
+  return $content;
+}
+
+//=============================================================================
+//                           Private Functions
+//=============================================================================
+function _advanced_mail_reroute_log($mailkey, $from, $to, $reroute_rule, $reroute_email = '') {
+    db_query("INSERT INTO {advanced_mail_reroute_log} (timestamp, mailkey, from_email, to_email, reroute_rule, reroute_email)
+      VALUES (%d, '%s', '%s', '%s', %d, '%s')", time(), $mailkey, $from, $to, $reroute_rule, $reroute_email);
+}
+
+function _advanced_mail_reroute_reroute(&$message, $reroute_to) {
+  $message['body'] = is_array($message['body']) ? implode("\n\n", $message['body']) : $message['body'];
+  
+  global $base_url;
+  $message['subject'] = 'Rerouted email: '. $message['subject'];
+  
+  // Format copied from reroute_email module: http://drupal.org/project/reroute_email
+  $body_header  = "This email was rerouted.\n";
+  $body_header .= "Web site: @site\n";
+  $body_header .= "Mail key: @key\n";
+  $body_header .= "Originally to: <@to>\n";
+  $body_header .= "-----------------------\n";
+
+  $body_header = t($body_header, array('@site' => $base_url, '@to' => $message['to'], '@key' => $message['id']));
+
+  $message['body'] = $body_header . (is_array($message['body']) ? implode("\n\n", $message['body']) : $message['body']);
+  $message['to'] = $reroute_to;
+}
