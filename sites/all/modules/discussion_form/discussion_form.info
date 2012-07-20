@@ -1,0 +1,6 @@
+name = Discussion form
+description = Module discussion form
+package = "Maher and Maher"
+core = 6.x
+; Add a style sheet for all media
+stylesheets[all][] = content_rotator.css

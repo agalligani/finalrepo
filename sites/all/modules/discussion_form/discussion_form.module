@@ -1,0 +1,146 @@
+<?php
+ /**
+ * Implements hook_admin_menu()
+ */
+function discussion_boards_admin_menu() {
+  $items[] = array(
+    'title' => "Admin Expert Discussions",
+    'path' => 'discussion_boards_experts',
+    'query' => 'destination',
+    'parent_path' => 'admin_menu/expert discussions',
+  );
+  return $items;
+}
+
+/**
+* Implement hook_menu
+* This function defines the URL to the page created etc.
+*
+*/
+
+function discussion_form_menu() {
+  $items = array();
+  $items['discussion_form/%/%/add'] = array(
+    'title' => t('Discussion'),
+    'page callback' => 'discussion_form_form',
+    'page arguments' => array(1,2),
+    'access arguments' => array('access content'),
+    'description' => t('Discussion form'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+* This function gets called in the browser address bar for:
+* "http://yourhost/my_module/form" or
+* "http://yourhost/?q=my_module/form". It will generate
+* a page with this form on it.
+*/
+
+function discussion_form_form($a,$b) {
+	variable_set('expert_flag',$a);
+	variable_set('group_number',$b);
+	
+  // This form calls the form builder function via the
+  // drupal_get_form() function which takes the name of this form builder
+  // function as an argument. It returns the results to display the form.
+  
+  return drupal_get_form('discussion_form_my_form');
+
+}
+
+/**
+* This function is called the "form builder". It builds the form.
+* Notice, it takes one argument, the $form_state
+*/
+function discussion_form_my_form($form_state) {
+	if(variable_get('expert_flag')) {
+	}
+	
+	
+	$group_number = variable_get('group_number');
+
+
+	global $user;
+/**	dsm($user); **/
+
+	$ogs = $user->og_groups;
+	$og_option = array();
+	
+	foreach($ogs as $og) {
+			$og_options[$og['nid']] = $og['title'];
+	}
+	
+
+  $form['og_group'] = array(
+	'#type' => 'radios',
+	'#title'=>t('Post this discussion to the following group'),
+	'#options' => $og_options,
+	'#default_value'=>$group_number,
+    '#required' => TRUE, // Added
+	);
+	
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Discussion Topic'),    
+	'#description' => "Please enter a discussion topic.", // added
+    '#size' => 145, // added
+    '#maxlength' => 120, // added
+    '#required' => TRUE, // Added
+	);
+
+  $form['body'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Discussion Text'),    
+	'#description' => "Discussion text", // added
+    '#wysiwyg' => true,
+    '#required' => TRUE, // Added
+	);
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+
+function discussion_form_my_form_submit($form, &$form_state) { 
+	global $user;
+	$title = $form_state['values']['title'];
+	$group_nid = $form_state['values']['og_group'];
+	$ogs = $user->og_groups;
+	$og_title = $ogs[$group_nid]['title'];
+
+	$node = new StdClass();
+//	$node->nid = 
+	$node->type = 'discussion';
+//	$node->language
+	$node->uid = $user->uid;
+	$node->status = 0; // NODE_PUBLISHED
+	$node->created = time();
+	$node->changed = $node->created;
+	$node->og_groups[$group_nid] = $group_nid;
+	$node->og_groups_both[$group_nid] = $og_title;
+	$node->og_public=TRUE;
+	$node->field_ask_expert[0]['value'] = variable_get('expert_flag');
+//	$node->comment
+//	$node->promote = 0;
+//	$node->moderate = 0;
+//	$node->sticky = 0;
+
+	$node->title = $title;
+	$node->body = $form_state['values']['body'];
+	
+	
+	drupal_set_message(t('Your discussion \''.$title.'\'  posted to group '.$og_title.' has been saved.'));
+	node_save($node);
+	return 'discussion_boards_group';
+}
+
+
+
+function theme_discussion_form_form() {
+
+}

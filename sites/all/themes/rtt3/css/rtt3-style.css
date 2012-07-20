@@ -1161,6 +1161,15 @@ div#discussion-legend {
 	width: 100%;
 }
 
+div#discussion-group-msg {
+	text-align: right;
+	display: block;
+	padding-bottom: 3px;
+	padding-right: 28px;
+	line-height: 0;
+	color: #aa6600;
+	
+}
 
 div#key1, div#key2, div#key3   {
 	float: left;
@@ -2405,6 +2414,7 @@ a#resource-button:hover
 		text-decoration: none;
 }
 /*---------- custom pane layout for  front page using 2 column layout --------------*/
+.page-discussion-boards-experts .panel-2col,
 .page-discussion-boards-group .panel-2col,
 #pid-discussion-boards-2 .panel-2col,
 .front .panel-2col
@@ -2413,6 +2423,7 @@ a#resource-button:hover
 }
 
 
+.page-discussion-boards-experts .panel-col-first,
 .page-discussion-boards-group .panel-col-first,
 #pid-discussion-boards-2 .panel-col-first,
 .front .panel-col-first {
@@ -2420,12 +2431,14 @@ a#resource-button:hover
 	width: 685px;
 }
 
+.page-discussion-boards-experts .panel-col-first .inside,
 .page-discussion-boards-group .panel-col-first .inside,
 #pid-discussion-boards-2 .panel-col-first .inside,
 .front .panel-col-first .inside {
 	border: solid 2px #a50234;
 }
 
+.page-discussion-boards-experts .panel-col-first .pane-content,
 .page-discussion-boards-group .panel-col-first .pane-content,
 #pid-discussion-boards-2 .panel-col-first .pane-content,
 .front .panel-col-first .pane-content 
@@ -2434,8 +2447,10 @@ a#resource-button:hover
 	line-height: 1.2em;
 }
 
+.page-discussion-boards-experts .panel-col-first .inside  .inner, 
 .page-discussion-boards-group .panel-col-first .inside  .inner, 
 #pid-discussion-boards-2 .panel-col-first .inside  .inner, 
+.page-discussion-boards-experts .panel-col-last .inside  .inner,
 .page-discussion-boards-group .panel-col-last .inside  .inner,
 #pid-discussion-boards-2 .panel-col-last .inside  .inner,
 .front .panel-col-first .inside  .inner, 
@@ -2451,6 +2466,7 @@ a#resource-button:hover
 	
 }
 
+.page-discussion-boards-experts .panel-col-first .inside,
 .page-discussion-boards-group .panel-col-first .inside,
 #pid-discussion-boards-2 .panel-col-first .inside,
 .front .panel-col-first .inside {
@@ -2458,6 +2474,7 @@ a#resource-button:hover
 }
 
 
+.page-discussion-boards-experts .panel-col-last,
 .page-discussion-boards-group .panel-col-last,
 #pid-discussion-boards-2 .panel-col-last,
 .front .panel-col-last {
@@ -4350,12 +4367,13 @@ div.vertical-tabs ul.vertical-tabs-list li {
 			
 		
 	/* views styles */
-	
+	div.view-experts div.view-content  ul,
 	div.view-content-global-discussions-2 div.view-content  ul,
 	div.view-content-global-discussions-3 div.view-content  ul  {
 		list-style: none;
 	}
 
+	div.view-experts div.view-content  ul li,
 	div.view-content-global-discussions-2 div.view-content  ul li,
 	div.view-content-global-discussions-3 div.view-content  ul li  {
 		background: none;
@@ -4364,6 +4382,10 @@ div.vertical-tabs ul.vertical-tabs-list li {
 		padding-bottom: 3px;
 	}
 	
+	div.view-experts div.view-content  ul li div.views-field-title,
+	div.view-experts div.view-content  ul li div.views-field-timestamp,
+	div.view-experts div.view-content  ul li div.views-field-created,
+	div.view-experts div.view-content  ul li div.views-field-phpcode-1,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-title,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-timestamp,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-created,
@@ -4377,6 +4399,7 @@ div.vertical-tabs ul.vertical-tabs-list li {
 		float: left;
 	}
 	
+	div.view-experts div.view-content  ul li div.views-field-title,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-title,
 	div.view-content-global-discussions-3 div.view-content  ul li div.views-field-title {
 		width: 370px;
@@ -4384,11 +4407,13 @@ div.vertical-tabs ul.vertical-tabs-list li {
 		margin-right: 12px;
 	}
 	
+	div.view-experts div.view-content  ul li div.views-field-timestamp,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-timestamp,
 	div.view-content-global-discussions-3 div.view-content  ul li div.views-field-timestamp {
 		display: none;
 	}
 	
+	div.view-experts div.view-content  ul li div.views-field-created,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-created,
 	div.view-content-global-discussions-3 div.view-content  ul li div.views-field-created {
 		color: #777;
@@ -4396,21 +4421,25 @@ div.vertical-tabs ul.vertical-tabs-list li {
 		margin-top: -5px;
 	}
 	
+	div.view-experts div.view-content  ul li div.views-field-phpcode-1,
 	div.view-content-global-discussions-2 div.view-content  ul li div.views-field-phpcode-1,
 	div.view-content-global-discussions-3 div.view-content  ul li div.views-field-phpcode-1 {
 		width: 65px;
 		margin-top: -3px;
 	}
 	
+	div.view-experts div.view-content  li.views-row,
 	div.view-content-global-discussions-3 div.view-content  li.views-row  {
 		border: none;
 		margin-top: 20px;
 	}
 	
+	div.view-experts div.view-content  div.views-field-title,
 	div.view-content-global-discussions-3 div.view-content  div.views-field-title  {
 	margin-top: -2px;
 	}
 	
+	div.view-experts div.view-content  div.views-field-title  span,
 	div.view-content-global-discussions-3 div.view-content  div.views-field-title  span {
 		font-size: 13px;
 	}
