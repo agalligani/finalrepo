@@ -16,9 +16,10 @@ function ajax_resources_menu() {
     'type' => MENU_CALLBACK
   );
 
-  $items['resources-view'] = array(
+  $items['resources-view-json/%'] = array(
     'title' => 'Resources',
     'page callback' => 'views_get_view_results',
+	'page arguments' => array(1),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
@@ -59,9 +60,15 @@ function ajax_resources_menu() {
 
 
 
-function views_get_view_results() {
+function views_get_view_results($tid) {
   $viewname = 'resources_view';
   $view = views_get_view($viewname);
+ $args = array($tid); 
+ /* $args = array('359');  */
+	$output = $view->preview('default', $args);
+	if (empty($view->result)) {
+		print "no result";
+	}
   $view->render();
   return drupal_json($view->result);
 }
@@ -92,7 +99,7 @@ function ajax_resources_theme() {
 
 function ajax_resources_init() {
   theme('ajax_resources_javascript');
-    drupal_add_css(drupal_get_path('module', 'dblog') . '/dblog.css');
+     drupal_add_css(drupal_get_path('module', 'ajax_resources') . '/ajax_resources.css');
 }
 
 function theme_ajax_resources_javascript() {

@@ -4,18 +4,38 @@ Drupal.behaviors.ajax_resources = function (context) {
 
 //Populate the topics list with the taxonomy tree
 
-$('#topic-list').html('test');
 
     var updateTopics = function(data) {
-	var nids = '';
-    $.each(data, function() {
-		$("<li><a class='topicLink' href='/"+this['value']+"'>"+this['value']+"</a></li>").appendTo('ul#topic-list');
-
+	$.each(data, function() {
+		var topicItem = $("<li class='topic-level-"+this['depth']+"'></li>");
+		var topicLink = $("<a class='topicLink' href='/resources-view-json/"+this['nid']+"'>"+this['value']+"</a>");
+		topicItem.append(topicLink);
+		$('ul#topic-list').append(topicItem);
 		
-        nids += this['nid'] + "";
     });
-      $('#divResources').html(nids); // The “products” property is the list of products items 
+			$('a.topicLink', context).click(
+			function(){
+						$.ajax({
+							type: 'POST',
+							url: this.href, 			
+							success: updateResources,  
+							dataType: 'json', 		
+							data: 'js=1' 				
+								});
+					 return false;  
+			});
+
+	
+	var updateResources = function(data) {
+		$('#divResources').html('');
+		$.each(data, function() {
+					var resource_link = $('<div>'+this['node_title']+'</div>');
+					resource_link.appendTo('#divResources');
+			})
+		}
     } 
+	
+	
 
    $.ajax({
       type: 'POST',
@@ -24,6 +44,7 @@ $('#topic-list').html('test');
       dataType: 'json', 		// Define the type of data that is going to get back from the server
       data: 'js=1' 				// Pass a key/value pair
     });
+	
 
 	
 	
