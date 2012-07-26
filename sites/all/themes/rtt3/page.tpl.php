@@ -78,16 +78,12 @@
          <div id="nav-group" class="nav-group clearfix">
 		 			  			<div id="header-department-logo"></div>
 
-         <?php if ($logged_in): ?>
          <?php print theme('grid_block', $primary_links_tree, 'primary-menu'); ?>
 		<?php print theme('grid_block', $tabs, 'menu-content-tabs'); ?>
         <?php print theme('grid_block', $breadcrumb, 'breadcrumbs'); ?>
 
 
 <?php print theme('grid_block', $search_box, 'search-box'); ?>
-         <?php else: ?>
-		 <div class='primary-menu'></div>
-         <?php endif; ?>
           </div><!--/nav-group-->
           </div><!-- /header-group-inner -->
         </div><!-- /header-group -->

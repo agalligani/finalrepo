@@ -4509,3 +4509,31 @@ div#panels-ipe-control-container  {
 	
 
 }
+	/********************* for now hide the commons core default login page divs ***********/
+
+#block-commons_core-3 {
+	display: none;
+}
+
+.pane-commons-core-4 {
+	display: none;
+}
+
+
+
+#main-content #menu-content-tabs {
+	display: none;
+}
+
+#pid-content-documents .full-node {
+	float:right;
+	margin: 0 0 0 5px;
+	font-size: 10px;
+	line-height: 13px;
+/* border: solid 2px #a50234; */
+	background-color: #ffdddd;
+	padding: 15px;
+	width: 200px;
+
+	
+}

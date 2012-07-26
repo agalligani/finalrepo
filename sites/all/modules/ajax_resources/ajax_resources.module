@@ -1,0 +1,121 @@
+<?php
+/**
+* This module introduces an ajax solution for the resources page
+*/
+
+
+function ajax_resources_menu() {
+
+  $items = array();
+
+  $items['resources-page'] = array(
+    'title' => 'Resources',
+    'page callback' => 'resources_form',
+    'access arguments' => array('access content'),	
+	'file' => 'ajax_resources.form.inc',
+    'type' => MENU_CALLBACK
+  );
+
+  $items['resources-view'] = array(
+    'title' => 'Resources',
+    'page callback' => 'views_get_view_results',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+
+  $items['products/get'] = array(
+    'title' => 'Resources',
+    'page callback' => 'dynamic_resources_get_by_category_id',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+
+/*** taxonomy menus ***/
+  
+  $items['type-tree'] = array(
+    'title' => 'Resources',
+    'page callback' => 'type_tree',
+    'access arguments' => array('access content'),
+	'file' => 'ajax_resources.type.inc'
+  );
+  
+  $items['topic-tree'] = array(
+    'title' => 'Resources',
+    'page callback' => 'topic_tree',
+    'access arguments' => array('access content'),
+	'file' => 'ajax_resources.topic.inc',
+    'type' => MENU_CALLBACK
+  );
+
+  return $items;
+}
+
+/**
+* This function gets called in the browser address bar for:
+* "http://yourhost/my_module/form" or
+* "http://yourhost/?q=my_module/form". It will generate
+* a page with this form on it.
+*/
+
+
+
+function views_get_view_results() {
+  $viewname = 'resources_view';
+  $view = views_get_view($viewname);
+  $view->render();
+  return drupal_json($view->result);
+}
+
+function dynamic_resources_get_by_category_id($cat_id){
+  $items = '';
+  switch($cat_id){
+    case 12: 
+     $items = '<ul><li>Product 1</li><li>Product 2</li></ul>';
+     break;
+    case 20:
+     $items = '<ul><li>Product 3</li><li>Product 4</li></ul>';
+     break;  
+  }
+// create a JSON object. The object will contain a property named “products” that will be set with the $items variable. 
+  return drupal_json(array('products'=>$items));
+  exit;
+}
+
+ 
+function ajax_resources_theme() {
+   return array(
+      'ajax_resources_javascript' => array(
+         'arguments' => array(),
+      ),
+   );   
+}
+
+function ajax_resources_init() {
+  theme('ajax_resources_javascript');
+    drupal_add_css(drupal_get_path('module', 'dblog') . '/dblog.css');
+}
+
+function theme_ajax_resources_javascript() {
+  drupal_add_js(drupal_get_path('module', 'ajax_resources') . '/ajax_resources.js');
+}
+
+
+/**
+ * This function will return a vocabulary object which matches the
+ * given name. Will return null if no such vocabulary exists.
+ *
+ * @param String $vocabulary_name
+ *   This is the name of the section which is required
+ * @return Object
+ *   This is the vocabulary object with the name
+ *   or null if no such vocabulary exists
+ */
+function ajax_resources_get_vocabulary_by_name($vocabulary_name) {
+  $vocabs = taxonomy_get_vocabularies(NULL);
+  foreach ($vocabs as $vocab_object) {
+    if ($vocab_object->name == $vocabulary_name) {
+      return $vocab_object;
+    }
+  }
+  return NULL;
+}

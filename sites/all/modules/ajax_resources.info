@@ -1,0 +1,5 @@
+; $Id$
+name = "Ajax Resources"
+description = "Resource Page."
+core = 6.x
+package = Maher and Maher
