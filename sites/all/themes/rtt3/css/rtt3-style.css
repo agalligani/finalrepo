@@ -292,6 +292,23 @@ height: 200px;
 .header-region-inner {
 }
 
+ul#login-list {
+	list-style: none;
+	width: 640px;
+	float: right;
+	clear: all;
+}
+
+ul#login-list li {
+	display: block;	
+	float: left;
+	padding: 0 16px 0 0;
+}
+
+ul#login-list li a {
+	color: #ffffff;
+}
+
 /*user login form if it is in the Header region */
 
 .header-region-inner .block-user form,

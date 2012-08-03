@@ -12,6 +12,7 @@ function topic_tree() {
           $items[$i]['nid']=$term->tid; 
           $items[$i]['value']=$term->name;
           $items[$i]['depth']=$term->depth;
+          $items[$i]['desc']=$term->description;
 		  
           if($term->depth) {	
 				$items[$i]['parent']='/'.$x;				
@@ -19,7 +20,7 @@ function topic_tree() {
 				$x = $term->name;
 				$items[$i]['parent']='self';
 		  }
-		  
+
 		  
 /*		  = str_repeat('-', $term->depth) . $term->name; */
         }

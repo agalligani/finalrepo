@@ -205,20 +205,30 @@ function assignContent2(c) {
 		
 		// vv    vv  iiiiii  m      m  eeeeee   oooooo
 		// vv    vv    ii    mmm  mmm  ee      oo    oo
+		// vv    vv    ii    mmm  mmm  ee      oo    oo
 		// vv    vv    ii    mm mm mm  eeeee   oo    oo
 		//  vv  vv     ii    mm    mm  ee      oo    oo
 		//    vv     iiiiii  mm    mm  eeeeee   oooooo
 		
-			content_wrapper[c] = $("<div id='vid-wrapper'></div>");
+			content_wrapper[c] = $('<div id="vid-wrapper"></div>');
+//			content_wrapper[c] = $("<div id='vid-wrapper'>cccccccccccccccccccccccccccc</div>");
 			content_wrapper[c].appendTo(slide[c]);
 			
 			cv = content_value_txt[c];
+			
+			cv_index = cv.indexOf("vimeo.com/");
+			
+			cv_vid_string = cv.substr(cv_index+10, 100);
+			cv_iframe = $('<iframe src="http://player.vimeo.com/video/'+cv_vid_string+'?title=0&amp;byline=0&amp;portrait=0" width="317" height="193" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
+			
 			content[c] = $(cv);
 			content[c].height(193);
 			content[c].width(317);
-			content[c].appendTo(content_wrapper[c]);
+//			content[c].appendTo(content_wrapper[c]);
+			cv_iframe.appendTo(content_wrapper[c]);
 			
-			
+//						vimeo_player = '<iframe src="http://player.vimeo.com/video/38783873?title=0&amp;byline=0&amp;portrait=0" width="317" height="193" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+
 
 		break;
 		
@@ -239,8 +249,8 @@ function assignContent2(c) {
 				the_image.css({"height":"215px","width":"317px","cursor":"pointer"});
 
 				the_image.click(function(){
-//							window.open(content_value_txt[c], 'STLC Resource', "location=1,status=1,scrollbars=1");
-							window.open("http://www.yahoo.com", 'STLC Resource', "location=1,status=1,scrollbars=1");
+							window.open(content_value_txt[c], 'STLC Resource', "location=1,status=1,scrollbars=1");
+//							window.open("http://www.yahoo.com", 'STLC Resource', "location=1,status=1,scrollbars=1");
 							return false;
 				});
 

@@ -1,25 +1,142 @@
 
+div#search-bar {
+ width: 300px;
+ background-color: #F9F9F9;	
+ position: relative;
+ border: 2px solid #A50234;
+	background-color: #F4F9FF;
+	height: 120px;
+	float: left;
+	clear: left;
+}
+
+div#static-text {
+ width: 300px;
+ background-color: #F9F9F9;	
+ position: relative;
+     border: 2px solid #A50234;
+		background-color: #F4F9FF;
+	margin-top: 10px;
+	float: left;
+	clear: left;
+}
+
+div#static-text h3 {
+	margin-top: 0;
+	font-size: 12px;
+	color: #993333;
+	margin:20px;
+}
+
+div#static-text p {
+	margin-left:20px;
+	margin-right:20px;
+}
+
+
+
 div#resources-wrapper {
-	position: relative;
-	
+	position: absolute;	
+	top: 150;
+	right: 1px;
+    border: 2px solid #A50234;
+	width: 620px;
+	height: 840px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+div#divResources {
+	line-height: 15px;
+	width: 606px;
+	top: 25px;
+	left: 320px;
+	border-left: solid 1px #ddeeff;
+	padding-top: 7px;
+	background-color: #ffffff;
+}
+
+
+ul#topic-desc-list {
+	margin-top: 0px;
+	margin-left: 0px;
+	width: 620px;
+	list-style: none;
+/*	background-color: #ddeeff; */
+	display: block;
+}
+
+ul#topic-desc-list li.topic-title {
+	font-weight: bold;
+	margin-bottom: 1px;
+	background-color: #A50234;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	line-height: 13px;
+	color: #dddddd;
+	display: none;
+}
+
+ul#topic-desc-list li.topic-desc {
+	font-size: 10px;
+	background-color: #f9f9f9;
+	background-color: #F4F9FF;
+	background-color: #FfF5F0;
+	background-color: #ffffff;
+	padding: 15px;
+	line-height: 10px;
+	display: none;
+/*	color: #5588bb; */
+	color: #335577;
+}
+
+div.resource-header {
+	font-weight: bold;
+	color: #990000;
+}
+
+div#type-header {
+	display: none;
+}
+
+div#type-wrapper { 
+	position: absolute;
+	top: 25px;
+	left: 190px;
+}
+
+ul#type-list {
+	width: 100px;
+	background-color: #ddeeff;
+}
+
+ul#topic-list,
+ul#type-list {
+	font-size: 11px;
+	list-style: none;
+/*	background-color: #ddeeff; */
+	display: block;
 }
 
 ul#topic-list {
-	font-size: 11px;
-	font-weigth: bold;
-	list-style: none;
-	width: 234px;
-	background-color: #ddeeff;
-	display: block;
-	border-radius: 10px;
+	width: 180px;
 }
 
-ul#topic-list li {
+ul#topic-list li,
+ul#type-list li {
 	padding: 4px 2px 5px 4px;
 	line-height: 10px;
 }
 
-ul#topic-list li a {
+ul#topic-list li.activeLink,
+ul#type-list li.activeLink {
+	background: #222222;
+}
+
+ul#topic-list li a,
+ul#type-list li a {
 	text-decoration: none;
 }
 
@@ -29,22 +146,124 @@ ul#topic-list li.topic-level-0 {
 }
 
 ul#topic-list li.topic-level-1 {
-	margin-left: 25px;
+	margin-left: 15px;
 }
 
-div#divResources {
-	font-size: 11px;
-	line-height: 12px;
-	position: absolute;
-	width: 550px;
-	top: 0px;
-	left: 250px;
-	padding-top: 7px;
-	background-color: #9a9aaa;
-}
 
-div#divResources div {
+div#resourcesList {
 	margin-bottom: 12px;
 	margin-left: 10px;
 	margin-right: 10px;
+	border-bottom: dotted 1px #ccddff;
+	padding-bottom: 14px;
 }
+
+
+div.resource-teaser {
+	height: 28px;
+	line-height: 14px;
+	color: #444444;
+	font-size: 11px;
+	overflow: hidden;
+}
+
+div.resource-teaser p,
+div.resource-teaser strong,
+div.resource-teaser a {
+	display: inline;
+	line-height: 14px;
+	color: #444444;
+	font-size: 10px;	
+}
+
+div.resource-teaser font {
+	display: none;
+}
+
+
+select#group-select, 
+select#topic-select, 
+select#type-select {
+	font-size: 10px;
+	font-weight: bold;
+	color: #990000;
+		color: #335577;
+		color: #619ED4;
+		
+}
+
+div#group-select-label {
+	font-size: 10px;
+	width: 270px;
+	position: absolute;
+	top: 1px;
+	left: 14px;
+	display: block;
+	font-weight: bold;
+	color: #990000;
+}
+
+
+select#group-select {
+	width: 270px;
+	position: absolute;
+	top: 18px;
+	left: 14px;
+}
+
+
+div#topic-select-label {
+	font-size: 	10px;
+	width: 		100px;
+	position: 	absolute;
+	top: 35px;
+	left: 14px;
+	display: block;
+	font-weight: bold;
+	color: #990000;
+}
+
+select#topic-select {
+	width: 270px;
+	position: absolute;
+	top: 52px;
+	left: 14px;
+} 
+
+div#type-select-label {
+	font-size: 10px;
+	width: 120px;
+	position: absolute;
+	top: 70px;
+	left: 14px;
+	display: block;
+	font-weight: bold;
+	color: #990000;
+}
+
+
+select#type-select {
+	width: 120px;
+	position: absolute;
+	top: 87px;
+	left: 14px;
+}
+
+
+select#group-select option, 
+select#topic-select option, 
+select#type-select option {
+	font-size: 10px;
+		color: #619ED4;
+}
+
+div#resource-count {
+		font-size: 10px;
+		position: absolute;
+		bottom: 3px;
+		color: #666666;
+		position: absolute;
+		left: 190px;
+		bottom: 3px;
+}
+

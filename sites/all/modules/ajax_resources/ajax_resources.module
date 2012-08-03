@@ -16,17 +16,10 @@ function ajax_resources_menu() {
     'type' => MENU_CALLBACK
   );
 
-  $items['resources-view-json/%'] = array(
+  $items['resources-view-json/%/%/%'] = array(
     'title' => 'Resources',
     'page callback' => 'views_get_view_results',
-	'page arguments' => array(1),
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK
-  );
-
-  $items['products/get'] = array(
-    'title' => 'Resources',
-    'page callback' => 'dynamic_resources_get_by_category_id',
+	'page arguments' => array(1,2,3),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
@@ -47,6 +40,16 @@ function ajax_resources_menu() {
 	'file' => 'ajax_resources.topic.inc',
     'type' => MENU_CALLBACK
   );
+  
+/*** group/nid menu ***/
+  
+  $items['group-tree'] = array(
+    'title' => 'groups',
+    'page callback' => 'group_tree',
+    'access arguments' => array('access content'),
+	'file' => 'ajax_resources.group.inc'
+  );
+  
 
   return $items;
 }
@@ -60,10 +63,10 @@ function ajax_resources_menu() {
 
 
 
-function views_get_view_results($tid) {
+function views_get_view_results($tid,$tid2,$og_id) {
   $viewname = 'resources_view';
   $view = views_get_view($viewname);
- $args = array($tid); 
+ $args = array($tid,$tid2,$og_id); 
  /* $args = array('359');  */
 	$output = $view->preview('default', $args);
 	if (empty($view->result)) {
@@ -73,20 +76,7 @@ function views_get_view_results($tid) {
   return drupal_json($view->result);
 }
 
-function dynamic_resources_get_by_category_id($cat_id){
-  $items = '';
-  switch($cat_id){
-    case 12: 
-     $items = '<ul><li>Product 1</li><li>Product 2</li></ul>';
-     break;
-    case 20:
-     $items = '<ul><li>Product 3</li><li>Product 4</li></ul>';
-     break;  
-  }
-// create a JSON object. The object will contain a property named “products” that will be set with the $items variable. 
-  return drupal_json(array('products'=>$items));
-  exit;
-}
+
 
  
 function ajax_resources_theme() {

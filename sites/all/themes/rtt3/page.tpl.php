@@ -70,7 +70,15 @@
             </div><!-- /header-site-info -->
             <?php endif; ?>
                        <div id="header-region" class="header-region block">
+					   <div id="header-login-link" class="header-login-link">
+					   </div>
               <div id="header-region-inner" class="header-region-inner inner">
+  					   		<?php if (!$logged_in): ?>
+								<?php print "<ul id='login-list'>"; ?>
+								<?php print "<li><a href='/user'>Log in</a></li>"; ?>
+								<?php print "<li><a href='/user/register'>Create account</a></li>"; ?>
+								<?php print "</ul>"; ?>
+						   <?php endif; ?>
             <?php print $header; ?>
               </div><!-- /header-region-inner -->
 
