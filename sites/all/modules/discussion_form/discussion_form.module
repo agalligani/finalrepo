@@ -93,7 +93,7 @@ function discussion_form_my_form($form_state) {
   $form['body'] = array(
     '#type' => 'textarea',
     '#title' => t('Discussion Text'),    
-	'#description' => "Discussion text", // added
+	'#description' => '<span class="form-required">*</span> indicates a required field',
     '#wysiwyg' => true,
     '#required' => TRUE, // Added
 	);

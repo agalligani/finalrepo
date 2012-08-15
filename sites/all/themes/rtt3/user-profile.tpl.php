@@ -41,6 +41,7 @@
  * @see template_preprocess_user_profile()
  */
 ?>
+<?php /* dsm($profile); */ ?>
 <div class="profile">
   <div class="column-left">
     <?php print $profile['user_picture']; ?>
@@ -66,8 +67,19 @@
   </div>
   <div class="column-right">
     <?php 
+	/* hide the phone number and the email of the member */
       foreach ($profile as $section) {
-        print($section);
+	  $str = '<dt class="profile-profile_phone_number">';
+	  
+	  $stringpos = strpos( $section, $str );
+	  $section = $stringpos == 0 ? $section : substr($section, 0, $stringpos)."</dl>"; 
+	
+	  $str = '<dt class="profile-profile_email">Email</dt>';
+
+	  $stringpos = strpos( $section, $str );
+	  $section = $stringpos == 0 ? $section : substr($section, 0, $stringpos)."</dl>"; 
+	  
+	  print($section);
       } 
     ?>
   </div>

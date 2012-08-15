@@ -6,7 +6,7 @@
 	
 	
 	
-	$(".search-input").click( function() {$(this).value('')});
+//	$(".search-input").click( function() {$(this).value('')});
 	
 	
 //SECTION I - Grab all the values from the Scroller Node ...

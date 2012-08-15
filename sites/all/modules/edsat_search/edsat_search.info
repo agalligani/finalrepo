@@ -1,0 +1,7 @@
+; $Id$
+name = "edsat search"
+description = "Custom Search"
+core = 6.x
+package = Maher and Maher
+; Add a style sheet for all media
+stylesheets[all][] = edsat_search.css

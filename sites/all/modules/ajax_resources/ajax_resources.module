@@ -66,8 +66,9 @@ function ajax_resources_menu() {
 function views_get_view_results($tid,$tid2,$og_id) {
   $viewname = 'resources_view';
   $view = views_get_view($viewname);
- $args = array($tid,$tid2,$og_id); 
- /* $args = array('359');  */
+	$newTid2 = str_replace("-","+", $tid2);
+/*$args = array($tid,$tid2,$og_id); */
+$args = array($tid,$newTid2,$og_id);
 	$output = $view->preview('default', $args);
 	if (empty($view->result)) {
 		print "no result";

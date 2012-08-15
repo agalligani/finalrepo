@@ -1,16 +1,25 @@
 	// $Id$
 Drupal.behaviors.ajax_resources = function (context) {
 
-	window.resourceTopic 	= 'all';
-	window.resourceType 	= 'all';
-	window.og 				= 'all';
-	window.counter 			= 0;
+	window.resourceTopic 		= 'all';
+	window.resourceQryTopic 	= 'all';
+	window.resourceType 		= 'all';
+	window.og 					= 'all';
+	window.counter 				= 0;
 	
+// add an add resources button to the resources page
+	resourceButton = $("<a id='resource-button'>Add a Resource</a>");
+	resourceButton.click(function() {
+		window.location='/node/add/document';
+	});
+	resourceButton.appendTo('div#search-bar');
+
 // add a group select to the search bar
 
 	groupSelect	=	$('<select id="group-select"></select>');
 	groupSelect.appendTo('div#search-bar');
 
+	
 //Populate the groups select options list with the taxonomy tree	
 
     var updateGroups = function(data) {
@@ -33,7 +42,7 @@ Drupal.behaviors.ajax_resources = function (context) {
 			groupNid = $('select#group-select option:selected').val();
 						window.counter =0;
 						window.og = groupNid;
-						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+window.resourceTopic+'/'+window.og;
+						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+window.resourceQryTopic+'/'+window.og;
 
 						$('#divResources').html('');
 						$.ajax({
@@ -72,9 +81,12 @@ Drupal.behaviors.ajax_resources = function (context) {
 			
 						option_txt = this['value'];
 
-			if (this['depth'] == '1') {  option_txt = "-- "+option_txt; 	}
-			
-			var topicOption = $("<option value='"+this['nid']+"'>"+option_txt+"</option>");
+			if (this['depth'] == '1') {  option_txt = "-- "+option_txt; 	} else { my_parent = this['nid']; }
+
+		//we are assigning a class equal to the parent nid so we can extract all the values associate with the top-level nid
+		//this will allow us to pull all resources associated with the topics below a top-level topic
+		
+			var topicOption = $("<option class='"+my_parent+"' value='"+this['nid']+"'>"+option_txt+"</option>");
 			topicOption.appendTo(topicSelect);
 			
 			$('ul#topic-desc-list').append('<li id=\'title-'+this['nid']+'\' class=\'topic-title\'>'+this['value']+'</li>');
@@ -92,12 +104,33 @@ Drupal.behaviors.ajax_resources = function (context) {
 			topicNid = $('select#topic-select option:selected').val();
 						window.counter =0;
 						window.resourceTopic = topicNid;
+						window.resourceQryTopic = topicNid;
+						
+						topicChildren = $('option.'+topicNid);
+						
+						if(topicChildren.length) { //if this is a top-level document....
+							plusSign = '';
+							qryNids = '';
+							topicChildren.each( function() {
+								qryNids += plusSign+$(this).val();
+								plusSign = '-';
+							}
+								);
+						} else {
+								qryNids = topicNid;
+						}
+						
+//								alert(qryNids);
+						window.resourceQryTopic = qryNids;
+//						qryNids now equals the nid for the selected topic along with the nids for all the children topics 
+//						IF the topic is a parent topic...
+
 						$('li.topic-title').css('display','none');
 						$('li.topic-desc').css('display','none');
 						$('li#title-'+topicNid).fadeIn(2000);
 						$('li#desc-'+topicNid).fadeIn(3000);
 						
-						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+window.resourceTopic+'/'+window.og;
+						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+escape(window.resourceQryTopic)+'/'+window.og;
 
 						$('#divResources').html('');
 						$.ajax({
@@ -134,6 +167,13 @@ Drupal.behaviors.ajax_resources = function (context) {
 		$.each(data, function() {
 			var typeOption = $("<option value='"+this['nid']+"'>"+this['value']+"</option>");
 			typeOption.appendTo(typeSelect);
+			
+						
+			$('ul#type-desc-list').append('<li id=\'title-'+this['nid']+'\' class=\'type-title\'>'+this['value']+'</li>');
+			if(this['desc'] !='') {
+			$('ul#type-desc-list').append('<li id=\'desc-'+this['nid']+'\' class=\'type-desc\'>'+this['desc']+'</li>');
+}
+			
 
 			});
 		
@@ -144,7 +184,13 @@ Drupal.behaviors.ajax_resources = function (context) {
 			typeNid = $('select#type-select option:selected').val();
 						window.counter =0;
 						window.resourceType = typeNid;
-						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+window.resourceTopic+'/'+window.og;
+						$('li#title-init').css('display','none');
+						$('li.type-title').css('display','none');
+						$('li.type-desc').css('display','none');
+						$('li#title-'+typeNid).fadeIn(2000);
+						$('li#desc-'+typeNid).fadeIn(3000);
+
+						var theURL = 'http://'+document.domain+'/resources-view-json/'+window.resourceType+'/'+window.resourceQryTopic+'/'+window.og;
 
 						$('#divResources').html('');
 						$.ajax({
@@ -160,8 +206,7 @@ Drupal.behaviors.ajax_resources = function (context) {
 
 	}
 	
-
-		
+// CALLBACKS		
 		
 		
 //below are the functions for after the selections are made...
@@ -227,7 +272,7 @@ Drupal.behaviors.ajax_resources = function (context) {
 	
 
 	
-
+	
 
  
 

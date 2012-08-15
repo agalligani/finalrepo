@@ -1,0 +1,149 @@
+<?php
+/**
+* This module is a customization of the search form for the edsat site
+*/
+
+/**
+* Implements hook_form_alter().
+*/
+
+function edsat_search_form_alter(&$form, $form_state, $form_id) {
+
+  if($form_id == 'search_form') {
+    //do fun stuff here.
+//	  dpm($form);
+	  
+	  $boxTop 		= array();
+	  $boxBottom 	= array();
+	  $clearFixer   = array();
+	  
+	  $boxTop['basic-search'] = array(
+		'#type'=> 'markup',
+		'#value'=> '<ul id="search-tabs"><li class="search-on" id="basicTab">Basic Search</li>',
+	  );
+	  
+	  $boxTop['advanced-search'] = array(
+		'#type'=> 'markup',
+		'#value'=> '<li class="search-off" id="advancedTab">Advanced Search</li></ul>',
+	  );
+	  
+	  $boxTop['search-box'] = array(
+		'#type'=> 'markup',
+		'#value'=> '<div id="jq-search-box"><div id="red-bar"></div>',
+	  );
+	  
+	  $boxBottom['search-box-end'] = array(
+		'#type'=> 'markup',
+		'#value'=> '</div>',
+	  );
+	  
+	  $clearFixer['clearFixer'] = array(
+	      '#type'=> 'markup',
+		  '#value'=>'<div class="clearfix"></div>',
+		);
+		
+	  $form = array_merge($boxTop, $form);
+	  $form = array_merge($form, $boxBottom);
+	  $form = array_merge($form, $clearFixer);
+	  
+	  
+	 //insert a types select box after topics select box
+	 
+	 $catTopic = array();
+	 
+	 $catTopic['catTopic'] = array(
+	 		'#type'		=> 'select',
+			'#title'	=> t('Topics'),
+			'#prefix'	=> "<div class='criterion'>",
+			'#suffix' 	=> "</div>",
+			'#multiple' => TRUE,
+	  );
+	  
+	 $catTopic['catTopic']['#options']['Topic'] = $form['advanced']['category']['#options']['Topic'];
+	 
+	 $catType = array();
+	 
+	 $catType['catType'] = array(
+	 		'#type'		=> 'select',
+			'#title'	=> t('Types'),
+			'#prefix'	=> "<div class='criterion'>",
+			'#suffix' 	=> "</div>",
+			'#multiple' => TRUE,
+	  );
+	  
+	 $catType['catType']['#options']['Type'] = $form['advanced']['category']['#options']['Type'];
+
+/*  this section is where the topics and types drop-downs are separated out and added. may reinstate in future ...
+	$pos = array_search('type', array_keys($form['advanced']));
+	$form['advanced'] = array_merge(array_slice($form['advanced'], 0, $pos), $catType, array_slice($form['advanced'], $pos));
+
+	$pos = array_search('type', array_keys($form['advanced']));
+	$form['advanced'] = array_merge(array_slice($form['advanced'], 0, $pos), $catTopic, array_slice($form['advanced'], $pos));
+*/	  
+	// Provide a default date in the format YYYY-MM-DD HH:MM:SS.
+	   $date = time();
+
+	// Provide a format using regular PHP format parts (see documentation on php.net).
+	// If you're using a date_select, the format will control the order of the date parts in the selector,
+	// rearrange them any way you like. Parts left out of the format will not be displayed to the user.
+
+	  $format = 'Y-m-d';
+	  
+	  
+
+	  $form['advanced']['date-start'] = array(
+     '#type' => 'date_select', // types 'date_text' and 'date_timezone' are also supported. See .inc file.
+     '#title' => t('Start date'),
+     '#default_value' => $date,
+     '#date_format' => $format,
+     '#date_label_position' => 'within', // See other available attributes and what they do in date_api_elements.inc
+     '#date_timezone' => 'America/Chicago', // Optional, if your date has a timezone other than the site timezone.
+     '#date_increment' => 15, // Optional, used by the date_select and date_popup elements to increment minutes and seconds.
+     '#date_year_range' => '-3:+0', // Optional, used to set the year range (back 3 years and forward 3 years is the default).
+	 '#access' =>FALSE,
+  );
+	  
+	  $form['advanced']['date-end'] = array(
+     '#type' => 'date_select', // types 'date_text' and 'date_timezone' are also supported. See .inc file.
+     '#title' => t('End date'),
+     '#default_value' => $date,
+     '#date_format' => $format,
+     '#date_label_position' => 'within', // See other available attributes and what they do in date_api_elements.inc
+     '#date_timezone' => 'America/Chicago', // Optional, if your date has a timezone other than the site timezone.
+     '#date_increment' => 15, // Optional, used by the date_select and date_popup elements to increment minutes and seconds.
+     '#date_year_range' => '-3:+0', // Optional, used to set the year range (back 3 years and forward 3 years is the default).
+	 '#access' =>FALSE,
+  );
+	  
+	  $searched_value = $form['basic']['inline']['keys']['#default_value'];
+		$form['advanced']['category']['#title']='Select only these Topics and Types'; 
+
+//	  unset($form['basic']);
+	  $form['advanced']['#collapsible']=FALSE;
+	  $form['advanced']['#collapsed']=FALSE; 
+	  unset($form['advanced']['type']['#options']['scroller']); 
+	  unset($form['advanced']['type']['#options']['forum']); 
+	  unset($form['advanced']['type']['#options']['poll']); 
+	  unset($form['advanced']['type']['#options']['mass_contact']); 
+	  unset($form['advanced']['type']['#options']['notice']); 
+	  unset($form['advanced']['category']['#options']['State']); 
+	  unset($form['advanced']['category']['#options']['St']); 
+	  unset($form['advanced']['category']['#options']['Topics']); 
+	  unset($form['advanced']['category']['#options']['Increased Learning Time']); 
+	  unset($form['advanced']['category']['#options']['Document type']); 
+	  unset($form['advanced']['category']['#options']['Event type']); 
+	  unset($form['advanced']['category']['#options']['User role']); 
+	  unset($form['advanced']['type']); 
+
+  }
+
+}	
+
+/**
+* Implements hook_init
+*/
+
+function edsat_search_init() {
+	drupal_add_css(drupal_get_path('module', 'edsat_search') . '/edsat_search.css');
+	drupal_add_js(drupal_get_path('module', 'edsat_search') . '/edsat_search.js');
+}

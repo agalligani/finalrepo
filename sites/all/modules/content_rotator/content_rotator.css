@@ -26,7 +26,8 @@
 			height: 250px;
 			background: #121245 url(../content_rotator/images/movie-gradient.png) repeat-y 0 0;
 			border: solid 1px #ccddee;
-			position: absolute;
+/*			position: absolute; */
+			position: relative;
 			left: 0;
 			top: 0;
 			overflow: hidden;
@@ -174,3 +175,11 @@
 			font-weight: bold;
 			color: #6666ff;
 		}
+		
+		.panel-node .inner {
+			overflow: hidden;
+		}
+		
+
+		
+		

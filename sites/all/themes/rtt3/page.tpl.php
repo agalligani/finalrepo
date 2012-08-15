@@ -76,7 +76,7 @@
   					   		<?php if (!$logged_in): ?>
 								<?php print "<ul id='login-list'>"; ?>
 								<?php print "<li><a href='/user'>Log in</a></li>"; ?>
-								<?php print "<li><a href='/user/register'>Create account</a></li>"; ?>
+								<?php print "<li><a href='/user/register'>Join</a></li>"; ?>
 								<?php print "</ul>"; ?>
 						   <?php endif; ?>
             <?php print $header; ?>

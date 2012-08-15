@@ -186,9 +186,9 @@ function assignContent2(c) {
 				
 			var vh = '193px';
 			var vw = '317px';
-			content[c] = $('<object class="whoa" style="height: '+vh+'; width: '+vw+'"><param name="movie" value="https://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded"><param name="allowFullScreen" value="true"><param name="allowScriptAccess" value="always"></object>');
+			content[c] = $('<object class="whoa" style="height: '+vh+'; width: '+vw+'"><param name="movie" value="https://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded"><param name="allowFullScreen" value="true"><param name="allowScriptAccess" value="always"><param name="wmode" value="opaque" /></object>');
 //			content_embed[c] = $('<embed src="'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" width="'+vw+'" height="'+vh+'">');
-			content_embed[c] = $('<embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" width="'+vw+'" height="'+vh+'">');
+			content_embed[c] = $('<div><embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></div>');
 
 			content_embed[c].appendTo(content[c]);
 			

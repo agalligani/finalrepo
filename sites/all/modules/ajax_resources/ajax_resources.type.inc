@@ -12,6 +12,8 @@ function type_tree() {
           $items[$i]['nid']=$term->tid; 
           $items[$i]['value']=$term->name;
           $items[$i]['depth']=$term->depth;
+          $items[$i]['desc']=$term->description;
+
 		  
           if($term->depth) {	
 				$items[$i]['parent']='/'.$x;				
