@@ -175,29 +175,23 @@ function assignContent2(c) {
 
 			trimStart = content_value[c].indexOf('=');
 			trimStop = content_value[c].indexOf('&');
-//			if(trimStop == -1) {
-//					cv = 	content_value[c].substr(trimStart+1,content_value[c].length);
-//			}
-//			if(trimStop > 0) {
-//				cv = 	content_value[c].substring(trimStart+1,trimStop);
-//			}
 
 				cv = content_value[c].substr(16,content_value[c].length);
 				
 			var vh = '193px';
 			var vw = '317px';
-			content[c] = $('<object class="whoa" style="height: '+vh+'; width: '+vw+'"><param name="movie" value="https://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded"><param name="allowFullScreen" value="true"><param name="allowScriptAccess" value="always"><param name="wmode" value="opaque" /></object>');
-//			content_embed[c] = $('<embed src="'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" width="'+vw+'" height="'+vh+'">');
-			content_embed[c] = $('<div><embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></div>');
-
-			content_embed[c].appendTo(content[c]);
+			content[c] = $('<object class="whoa" style="height: '+vh+'; width: '+vw+'"><param name="movie" value="https://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded"><param name="allowFullScreen" value="true"><param name="allowScriptAccess" value="always"><param name="wmode" value="opaque" /><embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></embed></object>');
+//			content_embed[c] = $('<div><embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></embed></div>');
+//			content_embed[c] = $('<embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></embed>');
+//			content_embed[c] = $('<embed src="http://www.youtube.com/v/'+cv+'?version=3&feature=player_embedded" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" wmode="opaque" width="'+vw+'" height="'+vh+'"></embed>');
+//alert(content_embed[c].html());
+//			content_embed[c].appendTo(content_wrapper[c]);
 			
 			content[c].appendTo(content_wrapper[c]);
 			
 			
 		content[c].bind('mouseover', function(e) {stop=1;});		
 
-			//	mousedown(function() {alert('heck yeah!');});
 			
 		break;
 		
@@ -249,7 +243,7 @@ function assignContent2(c) {
 				the_image.css({"height":"215px","width":"317px","cursor":"pointer"});
 
 				the_image.click(function(){
-							window.open(content_value_txt[c], 'STLC Resource', "location=1,status=1,scrollbars=1");
+							window.open(content_value_txt[c]);
 //							window.open("http://www.yahoo.com", 'STLC Resource', "location=1,status=1,scrollbars=1");
 							return false;
 				});
@@ -325,7 +319,8 @@ function content_load(v) {
 /**********************************************************************************************/
 /**********************************************************************************************/						
 /**********************************************************************************************/						
-						
+
+			
 			var view_switch	= $('<div class="panel-pane pane-views">' +
 								'<div class="inner">' +
 								'<h2 class="pane-title block-title cc">Community Content</h2>' +
@@ -348,7 +343,8 @@ function content_load(v) {
 				
 
 				$('div.#view_switch_1').click(function() {
-					$(this).addClass('view_switch_on').removeClass('view_switch_off');				
+					$(this).addClass('view_switch_on').removeClass('view_switch_off');
+									window.active_view_switch = 'latest';
 					$('div.#view_switch_2').addClass('view_switch_off').removeClass('view_switch_on');		
 					$("div.panel-2col div.pane-homepage-recent-featured").fadeIn();
 					$("div.panel-2col div.pane-popular").hide();					
@@ -356,6 +352,7 @@ function content_load(v) {
 				
 				$('div.#view_switch_2').click(function() {
 					$(this).addClass('view_switch_on').removeClass('view_switch_off');				
+								window.active_view_switch = 'popular';
 					$('div.#view_switch_1').addClass('view_switch_off').removeClass('view_switch_on');
 								$("div.panel-2col div.pane-homepage-recent-featured").hide();
 								$("div.panel-2col div.pane-popular").fadeIn();						

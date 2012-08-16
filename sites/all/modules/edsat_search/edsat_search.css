@@ -32,6 +32,7 @@ div#jq-search-box  input#edit-keys {
    background: #ffffff;
 	position: absolute;
 	left: 35px;
+	border: 1px inset #96A7B8;
 }
 
 div#red-bar {	

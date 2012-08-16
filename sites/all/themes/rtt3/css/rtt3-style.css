@@ -621,6 +621,7 @@ input#edit-keys {
 	background: transparent;
 	height: 22px;
 		line-height: 22px;
+	border: none;
 
 }
 
@@ -4599,4 +4600,13 @@ h4 a:hover {
 	color: #2299dd;
 	text-decoration: underline;	
 }
-	
+
+views-throbbing {
+	display: none;
+}
+
+/* hide crap on group pages */
+
+div.link-field-subrow {
+	display: none;
+}

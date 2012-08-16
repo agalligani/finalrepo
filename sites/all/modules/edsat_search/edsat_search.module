@@ -11,8 +11,10 @@ function edsat_search_form_alter(&$form, $form_state, $form_id) {
 
   if($form_id == 'search_form') {
     //do fun stuff here.
+//		global $user;
+//		if ($user->uid == '3108') {
 //	  dpm($form);
-	  
+//	  }
 	  $boxTop 		= array();
 	  $boxBottom 	= array();
 	  $clearFixer   = array();
