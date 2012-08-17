@@ -43,7 +43,8 @@
   <?php global $user; ?>
   <?php if (!$user->uid): ?>
     <div class="user-login-message">
-	 <h4>In order to see a full directory of your peers on the School Turnaround Learning Community, please <a href='/user'>Login</a> or <a href='/user/register'>Register to join our site</a>.  Registration is free and it only takes a moment!</h4>
+	<?php global $base_url; ?>
+	 <h4>In order to see a full directory of your peers on the School Turnaround Learning Community, please <a href='<?php print $base_url; ?>/user'>Login</a> or <a href='<?php print $base_url; ?>/user/register'>Register to join our site</a>.  Registration is free and it only takes a moment!</h4>
     </div>
 	<?php endif; ?>
 

@@ -73,10 +73,11 @@
 					   <div id="header-login-link" class="header-login-link">
 					   </div>
               <div id="header-region-inner" class="header-region-inner inner">
+							<?php global $base_url; ?>
   					   		<?php if (!$logged_in): ?>
 								<?php print "<ul id='login-list'>"; ?>
-								<?php print "<li><a href='/user'>Log in</a></li>"; ?>
-								<?php print "<li><a href='/user/register'>Join</a></li>"; ?>
+								<?php print "<li><a href='".$base_url."/user'>Log in</a></li>"; ?>
+								<?php print "<li><a href='".$base_url."/user/register'>Join</a></li>"; ?>
 								<?php print "</ul>"; ?>
 						   <?php endif; ?>
             <?php print $header; ?>
